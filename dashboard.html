@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Credit Decision AI - Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%),
+                        url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-blend-mode: overlay;
+            color: #fff;
+        }
+
+        .overlay {
+            min-height: 100vh;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #00d4ff;
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+        }
+
+        .logo span {
+            color: #fff;
+            font-weight: 300;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #00d4ff;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding-top: 2rem;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #00d4ff, #7b2ff7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.2rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 1.5rem;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .stat-card .icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-card .label {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card .value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .decision-form {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .decision-form h2 {
+            margin-bottom: 1.5rem;
+            color: #00d4ff;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #00d4ff;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 1rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #00d4ff, #7b2ff7);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
+        }
+
+        .result-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-top: 2rem;
+            display: none;
+            animation: slideIn 0.5s ease;
+        }
+
+        .result-card.show {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-card h3 {
+            color: #00d4ff;
+            margin-bottom: 1rem;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .result-item {
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .result-item .label {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.85rem;
+        }
+
+        .result-item .value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-top: 0.5rem;
+        }
+
+        .status-approved { color: #00ff88; }
+        .status-rejected { color: #ff4757; }
+        .status-pending { color: #ffa502; }
+        .status-review { color: #00d4ff; }
+
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: rgba(255, 255, 255, 0.5);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 3rem;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #00d4ff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .api-status {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            font-weight: bold;
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+        }
+
+        .api-status.online {
+            background: rgba(0, 255, 136, 0.2);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            color: #00ff88;
+        }
+
+        .api-status.offline {
+            background: rgba(255, 71, 87, 0.2);
+            border: 1px solid rgba(255, 71, 87, 0.3);
+            color: #ff4757;
+        }
+
+        option {
+            background: #0f3460;
+            color: #fff;
+        }
+
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="overlay">
+        <nav class="navbar">
+            <div class="logo">💳 Credit<span>AI</span></div>
+            <div class="nav-links">
+                <a href="#dashboard">Dashboard</a>
+                <a href="#application">New Application</a>
+                <a href="/docs" target="_blank">API Docs</a>
+            </div>
+        </nav>
+
+        <div class="api-status online" id="apiStatus">● API Online</div>
+
+        <div class="container">
+            <div class="header">
+                <h1>Credit Decision Intelligence</h1>
+                <p>AI-Powered Risk Assessment & Loan Approval System</p>
+            </div>
+
+            <div class="stats-grid" id="statsGrid">
+                <div class="stat-card">
+                    <div class="icon">📊</div>
+                    <div class="label">Total Applications</div>
+                    <div class="value" id="totalApps">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="icon">✅</div>
+                    <div class="label">Approved</div>
+                    <div class="value" id="approvedCount">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="icon">❌</div>
+                    <div class="label">Rejected</div>
+                    <div class="value" id="rejectedCount">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="icon">⏳</div>
+                    <div class="label">Pending</div>
+                    <div class="value" id="pendingCount">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="icon">📈</div>
+                    <div class="label">Approval Rate</div>
+                    <div class="value" id="approvalRate">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="icon">💰</div>
+                    <div class="label">Avg Credit Score</div>
+                    <div class="value" id="avgCreditScore">-</div>
+                </div>
+            </div>
+
+            <div class="decision-form" id="application">
+                <h2>📝 New Credit Application</h2>
+                <form id="creditForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>First Name</label>
+                            <input type="text" id="firstName" value="John" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Last Name</label>
+                            <input type="text" id="lastName" value="Doe" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="email" value="john@example.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Annual Income ($)</label>
+                            <input type="number" id="income" value="85000" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Credit Score</label>
+                            <input type="number" id="creditScore" value="750" min="300" max="850" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Loan Amount ($)</label>
+                            <input type="number" id="loanAmount" value="50000" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Employment Status</label>
+                            <select id="employment">
+                                <option value="employed">Employed</option>
+                                <option value="self_employed">Self Employed</option>
+                                <option value="unemployed">Unemployed</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Years Employed</label>
+                            <input type="number" id="yearsEmployed" value="5" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Total Debt ($)</label>
+                            <input type="number" id="totalDebt" value="20000" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Monthly Debt Payments ($)</label>
+                            <input type="number" id="monthlyDebt" value="450" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">🚀 Process Application</button>
+                </form>
+
+                <div class="result-card" id="resultCard">
+                    <h3>📋 Decision Result</h3>
+                    <div class="result-grid">
+                        <div class="result-item">
+                            <div class="label">Application ID</div>
+                            <div class="value" id="resAppId">-</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="label">Decision</div>
+                            <div class="value" id="resDecision">-</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="label">Approval Probability</div>
+                            <div class="value" id="resProb">-</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="label">Risk Score</div>
+                            <div class="value" id="resRisk">-</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="label">Confidence</div>
+                            <div class="value" id="resConfidence">-</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="label">Processing Time</div>
+                            <div class="value" id="resTime">-</div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 1rem; padding: 1rem; background: rgba(255,255,255,0.1); border-radius: 10px;">
+                        <div class="label">Reasoning</div>
+                        <p id="resReasoning" style="margin-top: 0.5rem; line-height: 1.6;"></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer">
+                <p>Credit Decision AI v1.0.0 | Built with FastAPI + React + XGBoost + LLM</p>
+                <p>API Endpoint: http://localhost:8001/api/v1</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8001/api/v1';
+
+        async function loadStats() {
+            try {
+                const res = await fetch(`${API_URL}/dashboard-stats`);
+                if (!res.ok) throw new Error('API Error');
+                const data = await res.json();
+                
+                document.getElementById('totalApps').textContent = data.total_applications.toLocaleString();
+                document.getElementById('approvedCount').textContent = data.approved_count.toLocaleString();
+                document.getElementById('rejectedCount').textContent = data.rejected_count.toLocaleString();
+                document.getElementById('pendingCount').textContent = data.pending_count.toLocaleString();
+                document.getElementById('approvalRate').textContent = (data.approval_rate).toFixed(1) + '%';
+                document.getElementById('avgCreditScore').textContent = Math.round(data.average_credit_score);
+                
+                document.getElementById('apiStatus').textContent = '● API Online';
+                document.getElementById('apiStatus').className = 'api-status online';
+            } catch (e) {
+                console.error('Failed to load stats:', e);
+                document.getElementById('apiStatus').textContent = '● API Offline';
+                document.getElementById('apiStatus').className = 'api-status offline';
+            }
+        }
+
+        document.getElementById('creditForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            const originalText = btn.textContent;
+            btn.innerHTML = '<div class="loading"></div> Processing...';
+            btn.disabled = true;
+
+            const payload = {
+                applicant: {
+                    first_name: document.getElementById('firstName').value,
+                    last_name: document.getElementById('lastName').value,
+                    email: document.getElementById('email').value,
+                    date_of_birth: '1990-01-15',
+                    state: 'NY'
+                },
+                financial: {
+                    annual_income: parseFloat(document.getElementById('income').value),
+                    credit_score: parseInt(document.getElementById('creditScore').value),
+                    debt_amount: parseFloat(document.getElementById('totalDebt').value),
+                    years_employed: parseInt(document.getElementById('yearsEmployed').value),
+                    total_accounts: 5
+                },
+                loan: {
+                    loan_amount: parseFloat(document.getElementById('loanAmount').value),
+                    loan_term_months: 60,
+                    loan_purpose: 'home_improvement'
+                }
+            };
+
+            try {
+                const res = await fetch(`${API_URL}/credit-decision`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                if (!res.ok) {
+                    const errorData = await res.json();
+                    console.error('API Error:', errorData);
+                    alert('API Error: ' + JSON.stringify(errorData));
+                    btn.textContent = originalText;
+                    btn.disabled = false;
+                    return;
+                }
+                
+                const data = await res.json();
+                console.log('Response data:', data);
+
+                document.getElementById('resAppId').textContent = data.application_id;
+                
+                const decisionEl = document.getElementById('resDecision');
+                const decision = data.decision;
+                decisionEl.textContent = (typeof decision === 'string' ? decision : decision.value || decision).toUpperCase();
+                decisionEl.className = 'value status-' + (typeof decision === 'string' ? decision : decision.value || decision).toLowerCase();
+                
+                document.getElementById('resProb').textContent = (data.score).toFixed(1) + '%';
+                document.getElementById('resRisk').textContent = data.confidence.toFixed(2);
+                document.getElementById('resConfidence').textContent = (data.confidence * 100).toFixed(1) + '%';
+                document.getElementById('resTime').textContent = data.decision_time_ms.toFixed(0) + 'ms';
+                document.getElementById('resReasoning').textContent = data.reasoning;
+
+                document.getElementById('resultCard').classList.add('show');
+            } catch (e) {
+                console.error('Fetch error:', e);
+                alert('Error: ' + e.message);
+            } finally {
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }
+        });
+
+        loadStats();
+        setInterval(loadStats, 30000);
+    </script>
+</body>
+</html>

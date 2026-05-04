@@ -1,0 +1,1730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CreditAI Pro — Intelligent Lending Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+
+:root{
+  --c-bg:        #07090f;
+  --c-surface:   rgba(255,255,255,0.055);
+  --c-border:    rgba(255,255,255,0.09);
+  --c-border-hi: rgba(0,210,255,0.45);
+  --c-primary:   #00d2ff;
+  --c-accent:    #6c3fff;
+  --c-success:   #00e87a;
+  --c-warn:      #ffb020;
+  --c-error:     #ff4560;
+  --c-text:      #e8edf5;
+  --c-muted:     rgba(232,237,245,0.55);
+  --c-faint:     rgba(232,237,245,0.28);
+  --radius:      14px;
+  --radius-sm:   8px;
+  --nav-h:       64px;
+  --font-mono:   'DM Mono', monospace;
+  --font-sans:   'DM Sans', sans-serif;
+  --trans:       all .22s cubic-bezier(.4,0,.2,1);
+}
+
+html{scroll-behavior:smooth;}
+
+body{
+  font-family:var(--font-sans);
+  color:var(--c-text);
+  background:#07090f;
+  min-height:100vh;
+  overflow-x:hidden;
+  position:relative;
+}
+
+/* ── BACKGROUND IMAGE LAYER ── */
+#bg-img{
+  position:fixed;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:center;
+  z-index:0;
+  pointer-events:none;
+  opacity:0;
+  transition:opacity 1.2s ease;
+}
+#bg-img.loaded{opacity:1;}
+
+#bg-overlay{
+  position:fixed;
+  inset:0;
+  z-index:1;
+  pointer-events:none;
+  background:
+    linear-gradient(160deg,rgba(7,9,15,0.91) 0%,rgba(7,9,15,0.78) 60%,rgba(10,15,35,0.88) 100%);
+}
+
+#bg-noise{
+  position:fixed;
+  inset:0;
+  z-index:2;
+  pointer-events:none;
+  opacity:.028;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat:repeat;
+  background-size:200px;
+}
+
+/* ── GLOW ORBS ── */
+.orb{
+  position:fixed;
+  border-radius:50%;
+  filter:blur(120px);
+  pointer-events:none;
+  z-index:2;
+  opacity:.18;
+}
+.orb-1{width:600px;height:600px;background:var(--c-primary);top:-200px;left:-180px;}
+.orb-2{width:500px;height:500px;background:var(--c-accent);bottom:-150px;right:-150px;}
+.orb-3{width:350px;height:350px;background:var(--c-success);top:40%;left:55%;opacity:.09;}
+
+/* ── ALL CONTENT above background ── */
+.shell{position:relative;z-index:10;min-height:100vh;display:flex;flex-direction:column;}
+
+/* ── NAVBAR ── */
+nav{
+  height:var(--nav-h);
+  background:rgba(7,9,15,0.82);
+  backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--c-border);
+  padding:0 2rem;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  position:sticky;
+  top:0;
+  z-index:200;
+}
+.nav-logo{
+  display:flex;
+  align-items:center;
+  gap:.6rem;
+  font-size:1.2rem;
+  font-weight:700;
+  color:var(--c-text);
+  letter-spacing:-.3px;
+}
+.nav-logo .dot{
+  width:10px;height:10px;
+  border-radius:50%;
+  background:linear-gradient(135deg,var(--c-primary),var(--c-accent));
+  box-shadow:0 0 12px var(--c-primary);
+}
+.nav-logo span{color:var(--c-primary);}
+.nav-links{display:flex;gap:.25rem;}
+.nav-links a{
+  color:var(--c-muted);
+  text-decoration:none;
+  font-size:.82rem;
+  font-weight:500;
+  letter-spacing:.4px;
+  text-transform:uppercase;
+  padding:.5rem .9rem;
+  border-radius:var(--radius-sm);
+  transition:var(--trans);
+}
+.nav-links a:hover{color:var(--c-text);background:var(--c-surface);}
+.nav-right{display:flex;align-items:center;gap:1rem;}
+.api-pill{
+  display:flex;align-items:center;gap:.45rem;
+  font-size:.75rem;font-weight:600;
+  letter-spacing:.5px;text-transform:uppercase;
+  padding:.4rem .9rem;
+  border-radius:30px;
+  background:rgba(0,232,122,0.12);
+  border:1px solid rgba(0,232,122,0.3);
+  color:var(--c-success);
+  transition:var(--trans);
+}
+.api-pill.offline{background:rgba(255,69,96,0.12);border-color:rgba(255,69,96,0.3);color:var(--c-error);}
+.api-pill .pulse{
+  width:7px;height:7px;border-radius:50%;
+  background:var(--c-success);
+  animation:pulse 2s ease-in-out infinite;
+}
+.api-pill.offline .pulse{background:var(--c-error);animation:none;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.5;transform:scale(1.3);}}
+
+/* ── MAIN ── */
+main{flex:1;max-width:1540px;margin:0 auto;padding:2.5rem 2rem;width:100%;}
+
+/* ── PAGE HEADER ── */
+.page-header{
+  text-align:center;
+  padding:2rem 0 3rem;
+  animation:fadeUp .6s ease both;
+}
+.page-header h1{
+  font-size:clamp(2rem,4vw,3.2rem);
+  font-weight:700;
+  letter-spacing:-1.5px;
+  line-height:1.1;
+  background:linear-gradient(125deg,#fff 20%,var(--c-primary) 60%,var(--c-accent) 100%);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+  margin-bottom:.6rem;
+}
+.page-header p{color:var(--c-muted);font-size:1.05rem;font-weight:300;margin-bottom:1.2rem;}
+.badge-row{display:flex;justify-content:center;gap:.6rem;flex-wrap:wrap;}
+.badge{
+  display:inline-flex;align-items:center;gap:.4rem;
+  font-size:.73rem;font-weight:600;letter-spacing:.5px;text-transform:uppercase;
+  padding:.35rem .85rem;border-radius:30px;
+  background:var(--c-surface);border:1px solid var(--c-border);color:var(--c-muted);
+}
+.badge.blue{background:rgba(0,210,255,.1);border-color:rgba(0,210,255,.3);color:var(--c-primary);}
+.badge.purple{background:rgba(108,63,255,.1);border-color:rgba(108,63,255,.3);color:#a882ff;}
+.badge.green{background:rgba(0,232,122,.1);border-color:rgba(0,232,122,.3);color:var(--c-success);}
+
+/* ── TABS ── */
+.tabs-bar{
+  display:flex;gap:.25rem;
+  border-bottom:1px solid var(--c-border);
+  margin-bottom:2rem;
+}
+.tab-btn{
+  padding:.7rem 1.4rem;
+  border:none;background:none;
+  color:var(--c-muted);
+  font:600 .82rem/1 var(--font-sans);
+  letter-spacing:.5px;text-transform:uppercase;
+  cursor:pointer;
+  position:relative;
+  border-radius:var(--radius-sm) var(--radius-sm) 0 0;
+  transition:var(--trans);
+  display:flex;align-items:center;gap:.5rem;
+}
+.tab-btn:hover{color:var(--c-text);background:var(--c-surface);}
+.tab-btn.active{color:var(--c-primary);}
+.tab-btn.active::after{
+  content:'';
+  position:absolute;bottom:-1px;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--c-primary),var(--c-accent));
+}
+.tab-content{display:none;animation:fadeUp .3s ease both;}
+.tab-content.active{display:block;}
+
+/* ── STAT CARDS ── */
+.stats-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:1.25rem;
+  margin-bottom:2rem;
+}
+.stat-card{
+  background:var(--c-surface);
+  border:1px solid var(--c-border);
+  border-radius:var(--radius);
+  padding:1.4rem 1.5rem;
+  backdrop-filter:blur(20px);
+  position:relative;overflow:hidden;
+  transition:var(--trans);
+  cursor:default;
+}
+.stat-card::after{
+  content:'';
+  position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(0,210,255,.04) 0%,transparent 60%);
+  opacity:0;transition:var(--trans);
+}
+.stat-card:hover{transform:translateY(-5px);border-color:var(--c-border-hi);box-shadow:0 16px 48px rgba(0,210,255,.1);}
+.stat-card:hover::after{opacity:1;}
+.stat-icon{
+  width:42px;height:42px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:1rem;
+  background:rgba(0,210,255,.1);
+}
+.stat-icon svg{width:20px;height:20px;stroke:var(--c-primary);fill:none;stroke-width:1.8;}
+.stat-card.s-approved .stat-icon{background:rgba(0,232,122,.1);}
+.stat-card.s-approved .stat-icon svg{stroke:var(--c-success);}
+.stat-card.s-rejected .stat-icon{background:rgba(255,69,96,.1);}
+.stat-card.s-rejected .stat-icon svg{stroke:var(--c-error);}
+.stat-card.s-pending .stat-icon{background:rgba(255,176,32,.1);}
+.stat-card.s-pending .stat-icon svg{stroke:var(--c-warn);}
+.stat-card.s-rate .stat-icon{background:rgba(108,63,255,.1);}
+.stat-card.s-rate .stat-icon svg{stroke:#a882ff;}
+.stat-label{font-size:.72rem;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--c-faint);margin-bottom:.4rem;}
+.stat-value{font:700 2.1rem/1 var(--font-mono);color:var(--c-text);transition:var(--trans);}
+.stat-card.s-approved .stat-value{color:var(--c-success);}
+.stat-card.s-rejected .stat-value{color:var(--c-error);}
+.stat-card.s-pending  .stat-value{color:var(--c-warn);}
+.stat-card.s-rate     .stat-value{color:#a882ff;}
+.stat-delta{font-size:.73rem;color:var(--c-faint);margin-top:.4rem;}
+.stat-delta.up{color:var(--c-success);}
+.stat-delta.dn{color:var(--c-error);}
+
+/* ── GRID LAYOUT ── */
+.dash-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.5rem;margin-bottom:2rem;}
+.span-2{grid-column:span 2;}
+@media(max-width:1100px){.dash-grid{grid-template-columns:1fr 1fr;}.span-2{grid-column:span 2;}}
+@media(max-width:680px){.dash-grid{grid-template-columns:1fr;}.span-2{grid-column:span 1;}}
+
+/* ── CARDS ── */
+.card{
+  background:var(--c-surface);
+  border:1px solid var(--c-border);
+  border-radius:var(--radius);
+  padding:1.6rem;
+  backdrop-filter:blur(20px);
+}
+.card-title{
+  font-size:.82rem;font-weight:600;
+  letter-spacing:.6px;text-transform:uppercase;
+  color:var(--c-muted);margin-bottom:1.4rem;
+  display:flex;align-items:center;gap:.6rem;
+}
+.card-title svg{width:16px;height:16px;stroke:var(--c-primary);fill:none;stroke-width:1.8;}
+
+/* ── CHART CANVAS ── */
+canvas.chart{width:100%;display:block;}
+
+/* ── METRIC ROWS ── */
+.metric-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:.7rem 0;
+  border-bottom:1px solid var(--c-border);
+  font-size:.9rem;
+}
+.metric-row:last-child{border-bottom:none;}
+.metric-row .ml{color:var(--c-muted);}
+.metric-row .mv{font:600 .9rem/1 var(--font-mono);color:var(--c-primary);}
+.metric-row .bar-wrap{flex:1;margin:0 1rem;height:4px;background:rgba(255,255,255,.07);border-radius:2px;overflow:hidden;}
+.metric-row .bar-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--c-primary),var(--c-accent));}
+
+/* ── RECENT APPLICATIONS TABLE ── */
+.table-wrap{overflow-x:auto;margin-top:.5rem;}
+table{width:100%;border-collapse:collapse;font-size:.84rem;}
+thead th{
+  text-align:left;padding:.65rem .9rem;
+  font-size:.7rem;font-weight:600;letter-spacing:.7px;text-transform:uppercase;
+  color:var(--c-faint);
+  border-bottom:1px solid var(--c-border);
+  white-space:nowrap;
+}
+tbody td{padding:.7rem .9rem;border-bottom:1px solid rgba(255,255,255,.04);color:var(--c-muted);white-space:nowrap;}
+tbody tr:hover td{background:rgba(255,255,255,.03);color:var(--c-text);}
+.pill{
+  display:inline-block;padding:.25rem .7rem;border-radius:20px;
+  font-size:.7rem;font-weight:700;letter-spacing:.5px;text-transform:uppercase;
+}
+.pill.approved{background:rgba(0,232,122,.12);color:var(--c-success);}
+.pill.rejected{background:rgba(255,69,96,.12);color:var(--c-error);}
+.pill.pending {background:rgba(255,176,32,.12);color:var(--c-warn);}
+.pill.review  {background:rgba(0,210,255,.12);color:var(--c-primary);}
+
+/* ── RISK SCORE GAUGE ── */
+.gauge-wrap{text-align:center;padding:1rem 0;}
+.gauge-svg{width:180px;height:110px;margin:0 auto;display:block;}
+.gauge-val{font:700 2rem/1 var(--font-mono);color:var(--c-text);margin-top:.5rem;}
+.gauge-lbl{font-size:.72rem;color:var(--c-faint);letter-spacing:.5px;text-transform:uppercase;margin-top:.3rem;}
+
+/* ── FORM ── */
+.form-card{
+  background:var(--c-surface);
+  border:1px solid var(--c-border);
+  border-radius:var(--radius);
+  padding:2rem;
+  backdrop-filter:blur(20px);
+  margin-bottom:1.5rem;
+}
+.form-card h2{
+  font-size:1.4rem;font-weight:700;letter-spacing:-.3px;
+  color:var(--c-text);margin-bottom:.4rem;
+}
+.form-card .sub{color:var(--c-faint);font-size:.87rem;margin-bottom:2rem;}
+.section-divider{
+  grid-column:1/-1;
+  display:flex;align-items:center;gap:.8rem;
+  padding:.5rem 0;
+}
+.section-divider span{
+  font-size:.72rem;font-weight:700;letter-spacing:.8px;text-transform:uppercase;
+  color:var(--c-primary);white-space:nowrap;
+}
+.section-divider::before,.section-divider::after{content:'';flex:1;height:1px;background:var(--c-border);}
+.section-divider::before{display:none;}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1.2rem;}
+.fg{display:flex;flex-direction:column;gap:.45rem;}
+.fg label{font-size:.73rem;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--c-muted);}
+.fg input,.fg select{
+  padding:.82rem 1rem;
+  border:1px solid var(--c-border);
+  border-radius:var(--radius-sm);
+  background:rgba(255,255,255,.04);
+  color:var(--c-text);
+  font:500 .95rem/1 var(--font-sans);
+  outline:none;
+  transition:var(--trans);
+  -webkit-appearance:none;
+  appearance:none;
+}
+.fg input:focus,.fg select:focus{border-color:var(--c-primary);background:rgba(0,210,255,.05);box-shadow:0 0 0 3px rgba(0,210,255,.1);}
+.fg input::placeholder{color:var(--c-faint);}
+.fg select option{background:#1a1d2e;color:var(--c-text);}
+.fg .hint{font-size:.72rem;color:var(--c-faint);}
+.fg .err-msg{font-size:.72rem;color:var(--c-error);display:none;}
+.fg.has-error input,.fg.has-error select{border-color:var(--c-error);}
+.fg.has-error .err-msg{display:block;}
+.input-prefix{position:relative;}
+.input-prefix span{
+  position:absolute;left:.9rem;top:50%;transform:translateY(-50%);
+  font-size:.9rem;color:var(--c-faint);pointer-events:none;
+}
+.input-prefix input{padding-left:1.8rem;}
+.full{grid-column:1/-1;}
+
+/* ── SLIDER ── */
+.range-wrap{display:flex;flex-direction:column;gap:.5rem;}
+.range-wrap input[type=range]{
+  -webkit-appearance:none;appearance:none;
+  width:100%;height:4px;
+  background:linear-gradient(90deg,var(--c-primary) var(--pct,50%),rgba(255,255,255,.1) var(--pct,50%));
+  border-radius:2px;outline:none;border:none;padding:0;
+}
+.range-wrap input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;appearance:none;
+  width:18px;height:18px;border-radius:50%;
+  background:var(--c-primary);border:2px solid #fff;
+  box-shadow:0 0 8px rgba(0,210,255,.5);
+  cursor:pointer;
+}
+.range-val{font:600 1.1rem/1 var(--font-mono);color:var(--c-primary);}
+
+/* ── BUTTONS ── */
+.btn{
+  padding:.82rem 1.8rem;border:none;border-radius:var(--radius-sm);
+  font:600 .85rem/1 var(--font-sans);letter-spacing:.5px;text-transform:uppercase;
+  cursor:pointer;transition:var(--trans);
+  display:inline-flex;align-items:center;gap:.5rem;
+}
+.btn-primary{
+  background:linear-gradient(135deg,var(--c-primary),var(--c-accent));
+  color:#fff;
+  box-shadow:0 4px 24px rgba(0,210,255,.18);
+}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,210,255,.28);}
+.btn-primary:active{transform:translateY(0);}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+.btn-ghost{background:var(--c-surface);color:var(--c-primary);border:1px solid var(--c-border);}
+.btn-ghost:hover{background:rgba(0,210,255,.08);border-color:var(--c-border-hi);}
+.btn-danger{background:rgba(255,69,96,.12);color:var(--c-error);border:1px solid rgba(255,69,96,.25);}
+.btn-danger:hover{background:rgba(255,69,96,.2);}
+.btn-row{display:flex;gap:.75rem;flex-wrap:wrap;margin-top:1.6rem;}
+.btn-row .btn-primary{flex:1;}
+
+/* ── RESULT CARD ── */
+.result-card{
+  background:var(--c-surface);
+  border:1px solid var(--c-border);
+  border-radius:var(--radius);
+  padding:2rem;
+  backdrop-filter:blur(20px);
+  margin-top:1.5rem;
+  display:none;
+}
+.result-card.show{display:block;animation:fadeUp .4s ease both;}
+.decision-hero{
+  display:flex;align-items:center;gap:1.5rem;
+  padding:1.5rem;
+  border-radius:var(--radius-sm);
+  margin-bottom:1.8rem;
+  border:1px solid var(--c-border);
+}
+.decision-hero.approved{background:rgba(0,232,122,.07);border-color:rgba(0,232,122,.25);}
+.decision-hero.rejected{background:rgba(255,69,96,.07);border-color:rgba(255,69,96,.25);}
+.decision-hero.pending {background:rgba(255,176,32,.07);border-color:rgba(255,176,32,.25);}
+.decision-hero.review  {background:rgba(0,210,255,.07);border-color:rgba(0,210,255,.25);}
+.dec-icon{
+  width:56px;height:56px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+}
+.decision-hero.approved .dec-icon{background:rgba(0,232,122,.15);}
+.decision-hero.rejected .dec-icon{background:rgba(255,69,96,.15);}
+.decision-hero.pending  .dec-icon{background:rgba(255,176,32,.15);}
+.decision-hero.review   .dec-icon{background:rgba(0,210,255,.15);}
+.dec-icon svg{width:28px;height:28px;fill:none;stroke-width:2;}
+.decision-hero.approved .dec-icon svg{stroke:var(--c-success);}
+.decision-hero.rejected .dec-icon svg{stroke:var(--c-error);}
+.decision-hero.pending  .dec-icon svg{stroke:var(--c-warn);}
+.decision-hero.review   .dec-icon svg{stroke:var(--c-primary);}
+.dec-text .verdict{font-size:1.6rem;font-weight:700;letter-spacing:-.5px;}
+.decision-hero.approved .verdict{color:var(--c-success);}
+.decision-hero.rejected .verdict{color:var(--c-error);}
+.decision-hero.pending  .verdict{color:var(--c-warn);}
+.decision-hero.review   .verdict{color:var(--c-primary);}
+.dec-text .sub{color:var(--c-faint);font-size:.85rem;margin-top:.2rem;}
+.dec-prob{margin-left:auto;text-align:right;}
+.dec-prob .pval{font:700 2.2rem/1 var(--font-mono);color:var(--c-text);}
+.dec-prob .plbl{font-size:.7rem;color:var(--c-faint);letter-spacing:.5px;text-transform:uppercase;margin-top:.3rem;}
+
+.res-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1rem;margin-bottom:1.5rem;}
+.res-item{
+  background:rgba(255,255,255,.03);
+  border:1px solid var(--c-border);
+  border-radius:var(--radius-sm);
+  padding:1rem;
+  transition:var(--trans);
+}
+.res-item:hover{border-color:var(--c-border-hi);background:rgba(0,210,255,.04);}
+.res-item .rl{font-size:.68rem;font-weight:600;letter-spacing:.6px;text-transform:uppercase;color:var(--c-faint);}
+.res-item .rv{font:700 1.3rem/1 var(--font-mono);color:var(--c-text);margin-top:.5rem;}
+
+.reasoning-box{
+  background:rgba(0,210,255,.05);
+  border:1px solid rgba(0,210,255,.15);
+  border-radius:var(--radius-sm);
+  padding:1.4rem;
+  margin-bottom:1.5rem;
+}
+.reasoning-box .rl{font-size:.72rem;font-weight:600;letter-spacing:.6px;text-transform:uppercase;color:var(--c-primary);margin-bottom:.6rem;}
+.reasoning-box p{font-size:.9rem;line-height:1.75;color:var(--c-muted);}
+
+/* ── RISK PROGRESS BAR ── */
+.risk-bar-wrap{margin:.8rem 0 1.5rem;}
+.risk-bar-labels{display:flex;justify-content:space-between;font-size:.68rem;color:var(--c-faint);margin-bottom:.4rem;}
+.risk-bar-track{height:8px;background:rgba(255,255,255,.07);border-radius:4px;overflow:hidden;}
+.risk-bar-fill{height:100%;border-radius:4px;transition:width .8s cubic-bezier(.4,0,.2,1);background:linear-gradient(90deg,var(--c-success),var(--c-warn),var(--c-error));}
+.risk-bar-marker{position:relative;margin-top:.35rem;}
+.risk-bar-needle{
+  position:absolute;top:0;
+  width:2px;height:12px;background:#fff;border-radius:1px;
+  transform:translateX(-50%);
+  transition:left .8s cubic-bezier(.4,0,.2,1);
+  box-shadow:0 0 6px rgba(255,255,255,.4);
+}
+
+/* ── TOAST ── */
+#toast{
+  position:fixed;bottom:2rem;right:2rem;z-index:9999;
+  display:flex;flex-direction:column;gap:.6rem;
+  pointer-events:none;
+}
+.toast-item{
+  padding:.9rem 1.4rem;border-radius:var(--radius-sm);
+  font-size:.85rem;font-weight:500;
+  backdrop-filter:blur(20px);
+  border:1px solid var(--c-border);
+  background:rgba(20,23,35,.9);
+  color:var(--c-text);
+  animation:toastIn .3s ease both;
+  pointer-events:all;
+  display:flex;align-items:center;gap:.6rem;
+}
+.toast-item.success{border-color:rgba(0,232,122,.3);background:rgba(0,232,122,.1);}
+.toast-item.error  {border-color:rgba(255,69,96,.3);background:rgba(255,69,96,.1);}
+.toast-item.info   {border-color:rgba(0,210,255,.3);background:rgba(0,210,255,.1);}
+@keyframes toastIn{from{opacity:0;transform:translateX(20px);}to{opacity:1;transform:translateX(0);}}
+
+/* ── LOADING SPINNER ── */
+.spin{
+  display:inline-block;width:16px;height:16px;
+  border:2px solid rgba(255,255,255,.25);
+  border-top-color:#fff;
+  border-radius:50%;
+  animation:spin .7s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+.fade-up{animation:fadeUp .5s ease both;}
+.fade-up-1{animation-delay:.07s;}
+.fade-up-2{animation-delay:.14s;}
+.fade-up-3{animation-delay:.21s;}
+
+/* ── FOOTER ── */
+footer{
+  text-align:center;padding:1.8rem 2rem;
+  color:var(--c-faint);font-size:.78rem;
+  border-top:1px solid var(--c-border);
+  background:rgba(7,9,15,.6);
+  backdrop-filter:blur(10px);
+  line-height:1.8;
+  position:relative;z-index:10;
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:3px;}
+::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.2);}
+
+@media(max-width:768px){
+  .stats-grid{grid-template-columns:repeat(2,1fr);}
+  .nav-links{display:none;}
+  .page-header h1{letter-spacing:-1px;}
+  .dec-prob{display:none;}
+}
+</style>
+</head>
+<body>
+
+<!-- Background image loaded via JS to handle CORS gracefully -->
+<img id="bg-img" alt="" aria-hidden="true">
+<div id="bg-overlay"></div>
+<div id="bg-noise"></div>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+
+<div class="shell">
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">
+    <div class="dot"></div>
+    Credit<span>AI</span> Pro
+  </div>
+  <div class="nav-links">
+    <a href="#" onclick="switchTab('tab-dashboard',this.closest('nav').querySelectorAll('.tab-btn')[0]);return false;">Dashboard</a>
+    <a href="#" onclick="switchTab('tab-apply',document.querySelectorAll('.tab-btn')[1]);return false;">New Application</a>
+    <a href="#" onclick="switchTab('tab-history',document.querySelectorAll('.tab-btn')[2]);return false;">History</a>
+  </div>
+  <div class="nav-right">
+    <div class="api-pill" id="apiPill"><div class="pulse"></div><span id="apiLabel">API Online</span></div>
+  </div>
+</nav>
+
+<main>
+  <!-- HEADER -->
+  <div class="page-header">
+    <h1>Credit Intelligence Platform</h1>
+    <p>AI-powered risk assessment &amp; intelligent lending decisions at scale</p>
+    <div class="badge-row">
+      <span class="badge blue">XGBoost v2</span>
+      <span class="badge purple">LLM Enhanced</span>
+      <span class="badge green">Real-Time Scoring</span>
+      <span class="badge">FastAPI Backend</span>
+      <span class="badge">v2.4.0</span>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs-bar">
+    <button class="tab-btn active" onclick="switchTab('tab-dashboard',this)">
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </button>
+    <button class="tab-btn" onclick="switchTab('tab-apply',this)">
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+      New Application
+    </button>
+    <button class="tab-btn" onclick="switchTab('tab-history',this)">
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      History
+    </button>
+    <button class="tab-btn" onclick="switchTab('tab-model',this)">
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Model Insights
+    </button>
+  </div>
+
+  <!-- ═══════════════ DASHBOARD TAB ═══════════════ -->
+  <div id="tab-dashboard" class="tab-content active">
+
+    <!-- Stat cards -->
+    <div class="stats-grid fade-up">
+      <div class="stat-card">
+        <div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div>
+        <div class="stat-label">Total Applications</div>
+        <div class="stat-value" id="st-total">—</div>
+        <div class="stat-delta up" id="st-total-d"></div>
+      </div>
+      <div class="stat-card s-approved">
+        <div class="stat-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="stat-label">Approved</div>
+        <div class="stat-value" id="st-approved">—</div>
+        <div class="stat-delta up" id="st-approved-d"></div>
+      </div>
+      <div class="stat-card s-rejected">
+        <div class="stat-icon"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+        <div class="stat-label">Rejected</div>
+        <div class="stat-value" id="st-rejected">—</div>
+        <div class="stat-delta dn" id="st-rejected-d"></div>
+      </div>
+      <div class="stat-card s-pending">
+        <div class="stat-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+        <div class="stat-label">Pending</div>
+        <div class="stat-value" id="st-pending">—</div>
+        <div class="stat-delta" id="st-pending-d"></div>
+      </div>
+      <div class="stat-card s-rate">
+        <div class="stat-icon"><svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div>
+        <div class="stat-label">Approval Rate</div>
+        <div class="stat-value" id="st-rate">—</div>
+        <div class="stat-delta" id="st-rate-d"></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+        <div class="stat-label">Avg Credit Score</div>
+        <div class="stat-value" id="st-score">—</div>
+        <div class="stat-delta" id="st-score-d"></div>
+      </div>
+    </div>
+
+    <!-- Charts row -->
+    <div class="dash-grid fade-up fade-up-1">
+      <div class="card span-2">
+        <div class="card-title">
+          <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          Applications Over Time (Last 7 Days)
+        </div>
+        <canvas id="chartLine" class="chart" height="220"></canvas>
+      </div>
+      <div class="card">
+        <div class="card-title">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>
+          Decision Distribution
+        </div>
+        <canvas id="chartDonut" class="chart" height="220"></canvas>
+        <div id="donut-legend" style="display:flex;justify-content:center;gap:1.2rem;margin-top:.8rem;flex-wrap:wrap;font-size:.75rem;color:var(--c-muted)"></div>
+      </div>
+    </div>
+
+    <!-- Model + Risk + Recent -->
+    <div class="dash-grid fade-up fade-up-2">
+      <div class="card">
+        <div class="card-title">
+          <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          Model Performance
+        </div>
+        <div class="metric-row">
+          <span class="ml">Accuracy</span>
+          <div class="bar-wrap"><div class="bar-fill" style="width:94.2%"></div></div>
+          <span class="mv">94.2%</span>
+        </div>
+        <div class="metric-row">
+          <span class="ml">Precision</span>
+          <div class="bar-wrap"><div class="bar-fill" style="width:91.8%"></div></div>
+          <span class="mv">91.8%</span>
+        </div>
+        <div class="metric-row">
+          <span class="ml">Recall</span>
+          <div class="bar-wrap"><div class="bar-fill" style="width:88.5%"></div></div>
+          <span class="mv">88.5%</span>
+        </div>
+        <div class="metric-row">
+          <span class="ml">F1 Score</span>
+          <div class="bar-wrap"><div class="bar-fill" style="width:90.1%"></div></div>
+          <span class="mv">90.1%</span>
+        </div>
+        <div class="metric-row">
+          <span class="ml">AUC-ROC</span>
+          <div class="bar-wrap"><div class="bar-fill" style="width:96.3%"></div></div>
+          <span class="mv">0.963</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">
+          <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          Risk Distribution
+        </div>
+        <canvas id="chartBar" class="chart" height="190"></canvas>
+      </div>
+      <div class="card">
+        <div class="card-title">
+          <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          System Health
+        </div>
+        <div class="metric-row"><span class="ml">API Latency</span><span class="mv" style="color:var(--c-success)">48ms</span></div>
+        <div class="metric-row"><span class="ml">Model Version</span><span class="mv">xgb-v2.4.0</span></div>
+        <div class="metric-row"><span class="ml">LLM Model</span><span class="mv">claude-3</span></div>
+        <div class="metric-row"><span class="ml">Uptime</span><span class="mv" style="color:var(--c-success)">99.97%</span></div>
+        <div class="metric-row"><span class="ml">Requests Today</span><span class="mv" id="reqToday">—</span></div>
+        <div class="metric-row"><span class="ml">Avg Response</span><span class="mv">1.2s</span></div>
+      </div>
+    </div>
+
+    <!-- Recent Applications Table -->
+    <div class="card fade-up fade-up-3">
+      <div class="card-title" style="justify-content:space-between">
+        <span style="display:flex;align-items:center;gap:.6rem">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--c-primary)" stroke-width="1.8"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          Recent Applications
+        </span>
+        <button class="btn btn-ghost" style="padding:.4rem .9rem;font-size:.72rem;" onclick="refreshTable()">Refresh</button>
+      </div>
+      <div class="table-wrap">
+        <table id="recentTable">
+          <thead>
+            <tr>
+              <th>App ID</th>
+              <th>Applicant</th>
+              <th>Loan Amount</th>
+              <th>Credit Score</th>
+              <th>Risk Score</th>
+              <th>Decision</th>
+              <th>Date</th>
+              <th>Interest Rate</th>
+            </tr>
+          </thead>
+          <tbody id="recentBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /tab-dashboard -->
+
+
+  <!-- ═══════════════ NEW APPLICATION TAB ═══════════════ -->
+  <div id="tab-apply" class="tab-content">
+
+    <div class="form-card">
+      <h2>New Credit Application</h2>
+      <p class="sub">Complete all sections. The AI model will evaluate risk and return a decision within seconds.</p>
+
+      <form id="creditForm" novalidate>
+
+        <!-- Personal -->
+        <div class="form-grid">
+          <div class="section-divider full"><span>Personal Information</span></div>
+
+          <div class="fg">
+            <label>First Name</label>
+            <input type="text" id="firstName" placeholder="John" required>
+            <span class="err-msg">Required</span>
+          </div>
+          <div class="fg">
+            <label>Last Name</label>
+            <input type="text" id="lastName" placeholder="Doe" required>
+            <span class="err-msg">Required</span>
+          </div>
+          <div class="fg">
+            <label>Email Address</label>
+            <input type="email" id="email" placeholder="john@example.com" required>
+            <span class="err-msg">Valid email required</span>
+          </div>
+          <div class="fg">
+            <label>Phone Number</label>
+            <input type="tel" id="phone" placeholder="+1-555-0123" required>
+            <span class="err-msg">Required</span>
+          </div>
+          <div class="fg">
+            <label>Date of Birth</label>
+            <input type="date" id="dob" required>
+            <span class="err-msg">Required</span>
+          </div>
+          <div class="fg">
+            <label>State</label>
+            <select id="state">
+              <option value="NY">New York</option><option value="CA">California</option>
+              <option value="TX">Texas</option><option value="FL">Florida</option>
+              <option value="IL">Illinois</option><option value="WA">Washington</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+
+          <!-- Financial -->
+          <div class="section-divider full"><span>Financial Information</span></div>
+
+          <div class="fg">
+            <label>Annual Income</label>
+            <div class="input-prefix"><span>$</span><input type="number" id="income" placeholder="85000" min="0" required></div>
+            <span class="err-msg">Required</span>
+          </div>
+          <div class="fg">
+            <label>Credit Score <span style="color:var(--c-faint)">(300–850)</span></label>
+            <input type="number" id="creditScore" placeholder="750" min="300" max="850" required>
+            <span class="err-msg">Must be 300–850</span>
+          </div>
+          <div class="fg">
+            <label>Employment Status</label>
+            <select id="employment">
+              <option value="employed">Employed (Full-Time)</option>
+              <option value="self_employed">Self-Employed</option>
+              <option value="part_time">Part-Time</option>
+              <option value="retired">Retired</option>
+              <option value="unemployed">Unemployed</option>
+            </select>
+          </div>
+          <div class="fg">
+            <label>Years Employed</label>
+            <input type="number" id="yearsEmployed" placeholder="5" min="0" required>
+            <span class="err-msg">Required</span>
+          </div>
+          <div class="fg">
+            <label>Total Existing Debt</label>
+            <div class="input-prefix"><span>$</span><input type="number" id="totalDebt" placeholder="20000" min="0" required></div>
+            <span class="err-msg">Required</span>
+          </div>
+          <div class="fg">
+            <label>Monthly Debt Payments</label>
+            <div class="input-prefix"><span>$</span><input type="number" id="monthlyDebt" placeholder="450" min="0" required></div>
+            <span class="err-msg">Required</span>
+          </div>
+          <div class="fg">
+            <label>Savings Balance</label>
+            <div class="input-prefix"><span>$</span><input type="number" id="savings" placeholder="25000" min="0" required></div>
+            <span class="err-msg">Required</span>
+          </div>
+          <div class="fg">
+            <label>Open Credit Accounts</label>
+            <input type="number" id="openAccounts" placeholder="4" min="0" required>
+            <span class="err-msg">Required</span>
+          </div>
+
+          <!-- Loan Details -->
+          <div class="section-divider full"><span>Loan Details</span></div>
+
+          <div class="fg full">
+            <label>Loan Amount — <span class="range-val" id="loanAmtDisplay">$50,000</span></label>
+            <div class="range-wrap">
+              <input type="range" id="loanAmountRange" min="1000" max="500000" step="1000" value="50000">
+            </div>
+            <input type="hidden" id="loanAmount" value="50000">
+          </div>
+
+          <div class="fg">
+            <label>Loan Term</label>
+            <select id="loanTerm">
+              <option value="12">12 months (1 yr)</option>
+              <option value="24">24 months (2 yr)</option>
+              <option value="36">36 months (3 yr)</option>
+              <option value="48">48 months (4 yr)</option>
+              <option value="60" selected>60 months (5 yr)</option>
+              <option value="84">84 months (7 yr)</option>
+              <option value="120">120 months (10 yr)</option>
+            </select>
+          </div>
+          <div class="fg">
+            <label>Loan Purpose</label>
+            <select id="loanPurpose">
+              <option value="home_improvement">Home Improvement</option>
+              <option value="debt_consolidation">Debt Consolidation</option>
+              <option value="auto">Auto Purchase</option>
+              <option value="education">Education</option>
+              <option value="business">Business</option>
+              <option value="medical">Medical</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="fg">
+            <label>Collateral</label>
+            <select id="collateral">
+              <option value="none">None</option>
+              <option value="property">Property</option>
+              <option value="vehicle">Vehicle</option>
+              <option value="savings">Savings Account</option>
+              <option value="other">Other Assets</option>
+            </select>
+          </div>
+
+          <div class="section-divider full"><span>DTI Preview</span></div>
+          <div class="fg full">
+            <div style="display:flex;gap:2rem;flex-wrap:wrap;padding:.8rem;background:rgba(0,210,255,.05);border:1px solid var(--c-border);border-radius:var(--radius-sm);">
+              <div><div class="stat-label">Monthly Income</div><div style="font:600 1.1rem/1 var(--font-mono);color:var(--c-text)" id="previewMonthly">—</div></div>
+              <div><div class="stat-label">Monthly Payment (est.)</div><div style="font:600 1.1rem/1 var(--font-mono);color:var(--c-warn)" id="previewPayment">—</div></div>
+              <div><div class="stat-label">Debt-to-Income Ratio</div><div style="font:600 1.1rem/1 var(--font-mono);color:var(--c-primary)" id="previewDTI">—</div></div>
+              <div><div class="stat-label">Loan-to-Income Ratio</div><div style="font:600 1.1rem/1 var(--font-mono);color:var(--c-primary)" id="previewLTI">—</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button type="submit" class="btn btn-primary" id="submitBtn">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 8 12 12 14 14"/></svg>
+            Process Application
+          </button>
+          <button type="button" class="btn btn-ghost" onclick="resetForm()">Clear</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- RESULT -->
+    <div class="result-card" id="resultCard">
+      <h2 style="font-size:1.2rem;font-weight:700;color:var(--c-muted);letter-spacing:.5px;text-transform:uppercase;margin-bottom:1.4rem;">Decision Result</h2>
+
+      <div id="decisionHero" class="decision-hero approved">
+        <div class="dec-icon">
+          <svg id="decIcon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div class="dec-text">
+          <div class="verdict" id="verdictText">APPROVED</div>
+          <div class="sub" id="verdictSub">Application meets lending criteria</div>
+        </div>
+        <div class="dec-prob">
+          <div class="pval" id="decProbVal">—</div>
+          <div class="plbl">Approval Probability</div>
+        </div>
+      </div>
+
+      <!-- Risk bar -->
+      <div class="risk-bar-wrap">
+        <div class="risk-bar-labels"><span>Low Risk</span><span>Medium</span><span>High Risk</span></div>
+        <div class="risk-bar-track"><div class="risk-bar-fill" id="riskBarFill" style="width:100%"></div></div>
+        <div class="risk-bar-marker"><div class="risk-bar-needle" id="riskNeedle" style="left:30%"></div></div>
+      </div>
+
+      <div class="res-grid">
+        <div class="res-item"><div class="rl">Application ID</div><div class="rv" id="r-appid">—</div></div>
+        <div class="res-item"><div class="rl">Risk Score</div><div class="rv" id="r-risk">—</div></div>
+        <div class="res-item"><div class="rl">Interest Rate</div><div class="rv" id="r-rate">—</div></div>
+        <div class="res-item"><div class="rl">Monthly Payment</div><div class="rv" id="r-monthly">—</div></div>
+        <div class="res-item"><div class="rl">Loan Term</div><div class="rv" id="r-term">—</div></div>
+        <div class="res-item"><div class="rl">Processing Time</div><div class="rv" id="r-time">—</div></div>
+        <div class="res-item"><div class="rl">Model Version</div><div class="rv" id="r-model">—</div></div>
+        <div class="res-item"><div class="rl">Decision Date</div><div class="rv" id="r-date">—</div></div>
+      </div>
+
+      <div class="reasoning-box">
+        <div class="rl">AI Reasoning</div>
+        <p id="r-reasoning">—</p>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="downloadReport()">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download Report
+        </button>
+        <button class="btn btn-ghost" onclick="copyAppId()">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copy ID
+        </button>
+        <button class="btn btn-ghost" onclick="resetForm();document.getElementById('resultCard').classList.remove('show')">
+          New Application
+        </button>
+      </div>
+    </div>
+
+  </div><!-- /tab-apply -->
+
+
+  <!-- ═══════════════ HISTORY TAB ═══════════════ -->
+  <div id="tab-history" class="tab-content">
+    <div class="card">
+      <div class="card-title" style="justify-content:space-between">
+        <span style="display:flex;align-items:center;gap:.6rem">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--c-primary)" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Application History
+        </span>
+        <div style="display:flex;gap:.5rem">
+          <select id="filterStatus" onchange="filterHistory()" style="background:var(--c-surface);border:1px solid var(--c-border);color:var(--c-text);padding:.4rem .7rem;border-radius:var(--radius-sm);font-size:.8rem;outline:none;">
+            <option value="">All Statuses</option>
+            <option value="approved">Approved</option>
+            <option value="rejected">Rejected</option>
+            <option value="pending">Pending</option>
+            <option value="review">Review</option>
+          </select>
+          <button class="btn btn-ghost" style="padding:.4rem .9rem;font-size:.72rem;" onclick="exportCSV()">Export CSV</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table id="historyTable">
+          <thead>
+            <tr>
+              <th>App ID</th><th>Applicant</th><th>Loan Amount</th>
+              <th>Credit Score</th><th>Risk Score</th><th>Decision</th>
+              <th>Interest Rate</th><th>Date</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="historyBody"></tbody>
+        </table>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:1rem;font-size:.8rem;color:var(--c-faint)">
+        <span id="historyCount">0 records</span>
+        <div style="display:flex;gap:.5rem">
+          <button class="btn btn-ghost" style="padding:.35rem .8rem;font-size:.72rem;" id="prevPage" onclick="changePage(-1)">Prev</button>
+          <span id="pageInfo" style="padding:.35rem .6rem;color:var(--c-muted)">Page 1</span>
+          <button class="btn btn-ghost" style="padding:.35rem .8rem;font-size:.72rem;" id="nextPage" onclick="changePage(1)">Next</button>
+        </div>
+      </div>
+    </div>
+  </div><!-- /tab-history -->
+
+
+  <!-- ═══════════════ MODEL INSIGHTS TAB ═══════════════ -->
+  <div id="tab-model" class="tab-content">
+    <div class="dash-grid">
+      <div class="card span-2">
+        <div class="card-title">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--c-primary)" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          Feature Importance
+        </div>
+        <canvas id="chartFeature" class="chart" height="260"></canvas>
+      </div>
+      <div class="card">
+        <div class="card-title">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--c-primary)" stroke-width="1.8"><circle cx="12" cy="12" r="10"/></svg>
+          Model Config
+        </div>
+        <div class="metric-row"><span class="ml">Algorithm</span><span class="mv">XGBoost v2</span></div>
+        <div class="metric-row"><span class="ml">Training Size</span><span class="mv">2.4M rows</span></div>
+        <div class="metric-row"><span class="ml">Features</span><span class="mv">47</span></div>
+        <div class="metric-row"><span class="ml">Max Depth</span><span class="mv">8</span></div>
+        <div class="metric-row"><span class="ml">Est. Trees</span><span class="mv">500</span></div>
+        <div class="metric-row"><span class="ml">LR</span><span class="mv">0.05</span></div>
+        <div class="metric-row"><span class="ml">Last Retrain</span><span class="mv">Apr 28, 2026</span></div>
+        <div class="metric-row"><span class="ml">Next Retrain</span><span class="mv">Jul 28, 2026</span></div>
+      </div>
+    </div>
+  </div><!-- /tab-model -->
+
+</main>
+
+<footer>
+  CreditAI Pro v2.4.0 &nbsp;|&nbsp; Enterprise Lending Intelligence Platform &nbsp;|&nbsp;
+  Built with FastAPI · XGBoost · Claude API &nbsp;|&nbsp;
+  API: <code style="color:var(--c-primary)">http://localhost:8001/api/v1</code>
+</footer>
+</div><!-- .shell -->
+
+<!-- Toast container -->
+<div id="toast"></div>
+
+<script>
+/* ═══════════ CONFIG ═══════════ */
+const API = 'http://localhost:8001/api/v1';
+
+/* ═══════════ BACKGROUND IMAGE ═══════════ */
+(function(){
+  const img = document.getElementById('bg-img');
+  // High-quality finance/data background from Unsplash (direct image, no redirect)
+  img.src = 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=2000&q=80';
+  img.onload  = () => img.classList.add('loaded');
+  img.onerror = () => {
+    // Fallback to a second image if first fails
+    img.src = 'https://images.unsplash.com/photo-1579547621706-1a9c79d5c9f1?auto=format&fit=crop&w=2000&q=80';
+    img.onload = () => img.classList.add('loaded');
+  };
+})();
+
+/* ═══════════ TABS ═══════════ */
+function switchTab(id, btn){
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if(btn) btn.classList.add('active');
+}
+
+/* ═══════════ TOAST ═══════════ */
+function toast(msg, type='info', dur=3500){
+  const box = document.getElementById('toast');
+  const el  = document.createElement('div');
+  el.className = `toast-item ${type}`;
+  const icons = {success:'✓ ',error:'✕ ',info:'ℹ '};
+  el.textContent = (icons[type]||'') + msg;
+  box.appendChild(el);
+  setTimeout(()=>{ el.style.opacity='0'; el.style.transform='translateX(20px)';
+    el.style.transition='all .3s ease'; setTimeout(()=>el.remove(),300); }, dur);
+}
+
+/* ═══════════ STATS / API ═══════════ */
+async function loadStats(){
+  try{
+    const r = await fetch(`${API}/dashboard-stats`);
+    if(!r.ok) throw new Error();
+    const d = await r.json();
+    animCount('st-total',    d.total_applications);
+    animCount('st-approved', d.approved_count);
+    animCount('st-rejected', d.rejected_count);
+    animCount('st-pending',  d.pending_count);
+    document.getElementById('st-rate').textContent  = (d.approval_rate*100).toFixed(1)+'%';
+    document.getElementById('st-score').textContent = Math.round(d.average_credit_score);
+    document.getElementById('reqToday').textContent = (d.total_applications||0).toLocaleString();
+    setOnline(true);
+  } catch{
+    setOnline(false);
+    // Use demo values when API is offline
+    animCount('st-total',    1247);
+    animCount('st-approved', 849);
+    animCount('st-rejected', 276);
+    animCount('st-pending',  122);
+    document.getElementById('st-rate').textContent  = '68.1%';
+    document.getElementById('st-score').textContent = '712';
+    document.getElementById('reqToday').textContent = '1,247';
+    document.getElementById('st-total-d').textContent   = '▲ 8.2% this week';
+    document.getElementById('st-approved-d').textContent= '▲ 5.1% vs last week';
+    document.getElementById('st-rejected-d').textContent= '▼ 2.3% improvement';
+    document.getElementById('st-pending-d').textContent = '12 awaiting review';
+    document.getElementById('st-rate-d').textContent    = 'Target: 70%';
+    document.getElementById('st-score-d').textContent   = '▲ 4pts avg this month';
+  }
+}
+
+function setOnline(on){
+  const p=document.getElementById('apiPill');
+  const l=document.getElementById('apiLabel');
+  p.className = 'api-pill'+(on?'':' offline');
+  l.textContent = on ? 'API Online' : 'API Offline';
+}
+
+function animCount(id, target){
+  const el = document.getElementById(id);
+  if(!el) return;
+  const start = 0, dur = 900, startTime = performance.now();
+  function step(now){
+    const p = Math.min((now-startTime)/dur,1);
+    const val = Math.round(p*target);
+    el.textContent = val.toLocaleString();
+    if(p<1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+/* ═══════════ DEMO DATA ═══════════ */
+const demoHistory = [
+  {id:'APP-20240501',name:'Alice Johnson',amount:42000,score:768,risk:0.18,decision:'approved',rate:5.4,date:'2026-04-30'},
+  {id:'APP-20240502',name:'Bob Martinez',amount:15000,score:610,risk:0.61,decision:'rejected',rate:null,date:'2026-04-30'},
+  {id:'APP-20240503',name:'Carol White',amount:88000,score:810,risk:0.09,decision:'approved',rate:3.9,date:'2026-04-29'},
+  {id:'APP-20240504',name:'David Lee',amount:25000,score:540,risk:0.78,decision:'rejected',rate:null,date:'2026-04-29'},
+  {id:'APP-20240505',name:'Eva Chen',amount:60000,score:720,risk:0.33,decision:'approved',rate:6.2,date:'2026-04-28'},
+  {id:'APP-20240506',name:'Frank Davis',amount:9000,score:690,risk:0.42,decision:'pending',rate:null,date:'2026-04-28'},
+  {id:'APP-20240507',name:'Grace Kim',amount:120000,score:790,risk:0.12,decision:'approved',rate:4.5,date:'2026-04-27'},
+  {id:'APP-20240508',name:'Henry Brown',amount:33000,score:620,risk:0.57,decision:'review',rate:null,date:'2026-04-27'},
+  {id:'APP-20240509',name:'Iris Patel',amount:75000,score:755,risk:0.24,decision:'approved',rate:5.8,date:'2026-04-26'},
+  {id:'APP-20240510',name:'Jack Wilson',amount:18000,score:580,risk:0.72,decision:'rejected',rate:null,date:'2026-04-26'},
+];
+
+let histPage = 0;
+const PAGE_SIZE = 7;
+let filteredHistory = [...demoHistory];
+
+function buildTableRow(r){
+  const risk = (r.risk*100).toFixed(0);
+  const riskColor = r.risk<0.3?'var(--c-success)':r.risk<0.6?'var(--c-warn)':'var(--c-error)';
+  return `<tr>
+    <td style="font-family:var(--font-mono);font-size:.8rem;color:var(--c-primary)">${r.id}</td>
+    <td>${r.name}</td>
+    <td style="font-family:var(--font-mono)">$${r.amount.toLocaleString()}</td>
+    <td style="font-family:var(--font-mono)">${r.score}</td>
+    <td style="font-family:var(--font-mono);color:${riskColor}">${risk}/100</td>
+    <td><span class="pill ${r.decision}">${r.decision.toUpperCase()}</span></td>
+    <td style="font-family:var(--font-mono)">${r.rate ? r.rate+'%' : '—'}</td>
+    <td>${r.date}</td>
+    <td><button class="btn btn-ghost" style="padding:.3rem .7rem;font-size:.7rem;" onclick="viewDetail('${r.id}')">View</button></td>
+  </tr>`;
+}
+
+function refreshTable(){
+  const tbody = document.getElementById('recentBody');
+  if(!tbody) return;
+  tbody.innerHTML = demoHistory.slice(0,6).map(buildTableRow).join('');
+}
+
+function filterHistory(){
+  const status = document.getElementById('filterStatus').value;
+  filteredHistory = status ? demoHistory.filter(r=>r.decision===status) : [...demoHistory];
+  histPage=0; renderHistoryPage();
+}
+
+function renderHistoryPage(){
+  const tbody=document.getElementById('historyBody');
+  if(!tbody) return;
+  const start=histPage*PAGE_SIZE, slice=filteredHistory.slice(start,start+PAGE_SIZE);
+  tbody.innerHTML = slice.length ? slice.map(buildTableRow).join('') :
+    '<tr><td colspan="9" style="text-align:center;padding:2rem;color:var(--c-faint)">No records found</td></tr>';
+  document.getElementById('historyCount').textContent = `${filteredHistory.length} records`;
+  document.getElementById('pageInfo').textContent = `Page ${histPage+1} of ${Math.max(1,Math.ceil(filteredHistory.length/PAGE_SIZE))}`;
+  document.getElementById('prevPage').disabled = histPage===0;
+  document.getElementById('nextPage').disabled = (histPage+1)*PAGE_SIZE>=filteredHistory.length;
+}
+
+function changePage(dir){
+  const max=Math.ceil(filteredHistory.length/PAGE_SIZE)-1;
+  histPage=Math.max(0,Math.min(max,histPage+dir));
+  renderHistoryPage();
+}
+
+function viewDetail(id){
+  const r=demoHistory.find(x=>x.id===id);
+  if(r) toast(`Viewing ${r.id}: ${r.name} — ${r.decision.toUpperCase()}`,'info');
+}
+
+function exportCSV(){
+  const hdr='App ID,Applicant,Loan Amount,Credit Score,Risk Score,Decision,Interest Rate,Date\n';
+  const rows=filteredHistory.map(r=>`${r.id},${r.name},${r.amount},${r.score},${(r.risk*100).toFixed(0)},${r.decision},${r.rate||''},${r.date}`).join('\n');
+  const a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(hdr+rows);
+  a.download='creditai-history.csv'; a.click();
+  toast('CSV exported','success');
+}
+
+/* ═══════════ CHARTS ═══════════ */
+function drawLineChart(){
+  const canvas=document.getElementById('chartLine');
+  if(!canvas) return;
+  const ctx=canvas.getContext('2d');
+  const W=canvas.offsetWidth||600, H=220;
+  canvas.width=W; canvas.height=H;
+
+  const days=['Apr 28','Apr 29','Apr 30','May 1','May 2','May 3','May 4'];
+  const apps=[38,55,47,62,71,58,80];
+  const approved=[24,38,30,44,51,40,57];
+
+  const pad={t:20,r:20,b:40,l:50};
+  const gW=W-pad.l-pad.r, gH=H-pad.t-pad.b;
+  const maxV=Math.max(...apps)*1.1;
+
+  ctx.clearRect(0,0,W,H);
+
+  // Grid
+  ctx.strokeStyle='rgba(255,255,255,0.05)';ctx.lineWidth=1;
+  for(let i=0;i<=4;i++){
+    const y=pad.t+(gH/4)*i;
+    ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(pad.l+gW,y);ctx.stroke();
+    ctx.fillStyle='rgba(232,237,245,0.3)';ctx.font='11px DM Mono,monospace';
+    ctx.fillText(Math.round(maxV*(1-i/4)),4,y+4);
+  }
+
+  // X labels
+  ctx.fillStyle='rgba(232,237,245,0.4)';ctx.font='11px DM Mono,monospace';ctx.textAlign='center';
+  days.forEach((d,i)=>{
+    const x=pad.l+(i/(days.length-1))*gW;
+    ctx.fillText(d,x,H-8);
+  });
+
+  function drawLine(data,color,fill){
+    const pts=data.map((v,i)=>({
+      x:pad.l+(i/(data.length-1))*gW,
+      y:pad.t+gH-(v/maxV)*gH
+    }));
+
+    if(fill){
+      const grad=ctx.createLinearGradient(0,pad.t,0,pad.t+gH);
+      grad.addColorStop(0,color.replace('1)','0.25)'));
+      grad.addColorStop(1,color.replace('1)','0)'));
+      ctx.beginPath();
+      ctx.moveTo(pts[0].x,pad.t+gH);
+      pts.forEach(p=>ctx.lineTo(p.x,p.y));
+      ctx.lineTo(pts[pts.length-1].x,pad.t+gH);
+      ctx.closePath();
+      ctx.fillStyle=grad;ctx.fill();
+    }
+
+    ctx.beginPath();
+    pts.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));
+    ctx.strokeStyle=color;ctx.lineWidth=2.5;ctx.lineJoin='round';
+    ctx.stroke();
+
+    pts.forEach(p=>{
+      ctx.beginPath();ctx.arc(p.x,p.y,4,0,Math.PI*2);
+      ctx.fillStyle=color;ctx.fill();
+    });
+  }
+
+  drawLine(apps,'rgba(0,210,255,1)',true);
+  drawLine(approved,'rgba(0,232,122,1)',false);
+
+  // Legend
+  const lx=pad.l+gW-120;
+  [[`rgba(0,210,255,1)`,'Total'],[`rgba(0,232,122,1)`,'Approved']].forEach(([c,l],i)=>{
+    ctx.fillStyle=c;ctx.fillRect(lx+i*65,6,14,3);
+    ctx.fillStyle='rgba(232,237,245,0.6)';ctx.font='11px DM Sans,sans-serif';ctx.textAlign='left';
+    ctx.fillText(l,lx+i*65+18,10);
+  });
+}
+
+function drawDonut(){
+  const canvas=document.getElementById('chartDonut');
+  if(!canvas) return;
+  const ctx=canvas.getContext('2d');
+  const W=canvas.offsetWidth||300, H=220;
+  canvas.width=W; canvas.height=H;
+
+  const data=[
+    {label:'Approved',val:68,color:'#00e87a'},
+    {label:'Rejected',val:22,color:'#ff4560'},
+    {label:'Pending', val:7, color:'#ffb020'},
+    {label:'Review',  val:3, color:'#00d2ff'},
+  ];
+  const total=data.reduce((s,d)=>s+d.val,0);
+  const cx=W/2,cy=H/2-5,r=Math.min(W,H)*0.36,ir=r*0.62;
+  let angle=-Math.PI/2;
+
+  data.forEach(d=>{
+    const sweep=(d.val/total)*Math.PI*2;
+    ctx.beginPath();ctx.moveTo(cx,cy);
+    ctx.arc(cx,cy,r,angle,angle+sweep);
+    ctx.closePath();ctx.fillStyle=d.color;ctx.fill();
+    angle+=sweep;
+  });
+
+  // Inner hole
+  ctx.beginPath();ctx.arc(cx,cy,ir,0,Math.PI*2);
+  ctx.fillStyle='#0d1117';ctx.fill();
+
+  // Center text
+  ctx.fillStyle='#fff';ctx.font='700 1.5rem DM Mono,monospace';ctx.textAlign='center';
+  ctx.fillText('68%',cx,cy+2);
+  ctx.fillStyle='rgba(232,237,245,0.5)';ctx.font='11px DM Sans,sans-serif';
+  ctx.fillText('Approval',cx,cy+18);
+
+  // Legend
+  const legend=document.getElementById('donut-legend');
+  if(legend){
+    legend.innerHTML=data.map(d=>`
+      <span style="display:flex;align-items:center;gap:.3rem">
+        <span style="width:10px;height:10px;border-radius:50%;background:${d.color};display:inline-block"></span>
+        ${d.label} ${d.val}%
+      </span>`).join('');
+  }
+}
+
+function drawBarChart(){
+  const canvas=document.getElementById('chartBar');
+  if(!canvas) return;
+  const ctx=canvas.getContext('2d');
+  const W=canvas.offsetWidth||300, H=190;
+  canvas.width=W; canvas.height=H;
+
+  const labels=['0–20','21–40','41–60','61–80','81–100'];
+  const vals=[12,28,35,18,7];
+  const colors=['#00e87a','#7ee87a','#ffb020','#ff7b4a','#ff4560'];
+
+  const pad={t:10,r:10,b:30,l:30};
+  const bW=(W-pad.l-pad.r)/labels.length;
+  const maxV=Math.max(...vals)*1.15;
+  const gH=H-pad.t-pad.b;
+
+  ctx.clearRect(0,0,W,H);
+
+  vals.forEach((v,i)=>{
+    const x=pad.l+i*bW+bW*.12;
+    const bh=(v/maxV)*gH;
+    const y=pad.t+gH-bh;
+
+    const grad=ctx.createLinearGradient(0,y,0,pad.t+gH);
+    grad.addColorStop(0,colors[i]);
+    grad.addColorStop(1,colors[i].replace('#','rgba(').replace(/([0-9a-f]{2})/gi,m=>parseInt(m,16)+',').slice(0,-1)+',0.3)');
+
+    ctx.fillStyle=grad;
+    ctx.beginPath();
+    ctx.roundRect(x,y,bW*.76,bh,4);
+    ctx.fill();
+
+    ctx.fillStyle='rgba(232,237,245,0.6)';
+    ctx.font='10px DM Mono,monospace';ctx.textAlign='center';
+    ctx.fillText(labels[i],pad.l+i*bW+bW/2,H-8);
+    ctx.fillStyle='rgba(232,237,245,0.9)';
+    ctx.fillText(v+'%',pad.l+i*bW+bW/2,y-4);
+  });
+}
+
+function drawFeatureChart(){
+  const canvas=document.getElementById('chartFeature');
+  if(!canvas) return;
+  const ctx=canvas.getContext('2d');
+  const W=canvas.offsetWidth||600, H=260;
+  canvas.width=W; canvas.height=H;
+
+  const features=[
+    {name:'Credit Score',val:0.28},
+    {name:'DTI Ratio',val:0.21},
+    {name:'Income',val:0.16},
+    {name:'Loan Amount',val:0.12},
+    {name:'Years Employed',val:0.09},
+    {name:'Open Accounts',val:0.07},
+    {name:'Savings Balance',val:0.04},
+    {name:'Loan Purpose',val:0.03},
+  ];
+
+  const pad={t:10,r:30,b:20,l:140};
+  const rowH=H/features.length;
+  const maxV=features[0].val*1.1;
+
+  ctx.clearRect(0,0,W,H);
+
+  features.forEach((f,i)=>{
+    const y=pad.t+i*rowH;
+    const bW=((W-pad.l-pad.r)*(f.val/maxV));
+    const bH=rowH*.55;
+    const by=y+(rowH-bH)/2;
+
+    const grad=ctx.createLinearGradient(pad.l,0,pad.l+bW,0);
+    grad.addColorStop(0,'rgba(0,210,255,0.9)');
+    grad.addColorStop(1,'rgba(108,63,255,0.7)');
+    ctx.fillStyle=grad;
+    ctx.beginPath();ctx.roundRect(pad.l,by,bW,bH,3);ctx.fill();
+
+    ctx.fillStyle='rgba(232,237,245,0.7)';
+    ctx.font='12px DM Sans,sans-serif';ctx.textAlign='right';
+    ctx.fillText(f.name,pad.l-8,by+bH/2+4);
+
+    ctx.fillStyle='rgba(232,237,245,0.9)';
+    ctx.font='600 11px DM Mono,monospace';ctx.textAlign='left';
+    ctx.fillText((f.val*100).toFixed(0)+'%',pad.l+bW+6,by+bH/2+4);
+  });
+}
+
+function initCharts(){
+  drawLineChart(); drawDonut(); drawBarChart(); drawFeatureChart();
+}
+
+/* ═══════════ LOAN RANGE SLIDER ═══════════ */
+(function(){
+  const range=document.getElementById('loanAmountRange');
+  const display=document.getElementById('loanAmtDisplay');
+  const hidden=document.getElementById('loanAmount');
+  if(!range) return;
+  function upd(){
+    const v=parseInt(range.value);
+    const pct=((v-parseInt(range.min))/(parseInt(range.max)-parseInt(range.min)))*100;
+    range.style.setProperty('--pct',pct+'%');
+    display.textContent='$'+v.toLocaleString();
+    hidden.value=v;
+    updateDTIPreview();
+  }
+  range.addEventListener('input',upd); upd();
+})();
+
+/* ═══════════ DTI PREVIEW ═══════════ */
+function updateDTIPreview(){
+  const income  = parseFloat(document.getElementById('income')?.value)||0;
+  const debt    = parseFloat(document.getElementById('monthlyDebt')?.value)||0;
+  const loan    = parseFloat(document.getElementById('loanAmount')?.value)||0;
+  const term    = parseInt(document.getElementById('loanTerm')?.value)||60;
+  const monthly = income/12;
+  const estRate = 0.07/12;
+  const payment = loan*(estRate*Math.pow(1+estRate,term))/(Math.pow(1+estRate,term)-1);
+  const dti     = monthly>0 ? ((debt+payment)/monthly*100) : 0;
+  const lti     = income>0 ? (loan/income) : 0;
+
+  document.getElementById('previewMonthly').textContent = monthly>0 ? '$'+Math.round(monthly).toLocaleString() : '—';
+  document.getElementById('previewPayment').textContent = payment>0 ? '$'+Math.round(payment).toLocaleString()+'/mo' : '—';
+  document.getElementById('previewDTI').textContent     = dti>0 ? dti.toFixed(1)+'%' : '—';
+  document.getElementById('previewLTI').textContent     = lti>0 ? lti.toFixed(2)+'x' : '—';
+}
+
+['income','monthlyDebt','loanTerm'].forEach(id=>{
+  const el=document.getElementById(id);
+  if(el) el.addEventListener('input',updateDTIPreview);
+});
+
+/* ═══════════ FORM VALIDATION ═══════════ */
+function validateForm(){
+  let ok=true;
+  const rules=[
+    {id:'firstName', test:v=>v.trim().length>0, msg:'Required'},
+    {id:'lastName',  test:v=>v.trim().length>0, msg:'Required'},
+    {id:'email',     test:v=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v), msg:'Valid email required'},
+    {id:'phone',     test:v=>v.trim().length>0, msg:'Required'},
+    {id:'income',    test:v=>parseFloat(v)>0,   msg:'Must be > 0'},
+    {id:'creditScore',test:v=>{const n=parseInt(v);return n>=300&&n<=850;},msg:'Must be 300–850'},
+    {id:'yearsEmployed',test:v=>parseFloat(v)>=0, msg:'Required'},
+    {id:'totalDebt', test:v=>parseFloat(v)>=0,  msg:'Required'},
+    {id:'monthlyDebt',test:v=>parseFloat(v)>=0, msg:'Required'},
+    {id:'savings',   test:v=>parseFloat(v)>=0,  msg:'Required'},
+    {id:'openAccounts',test:v=>parseInt(v)>=0,  msg:'Required'},
+  ];
+  rules.forEach(({id,test,msg})=>{
+    const el=document.getElementById(id);
+    const fg=el?.closest('.fg');
+    if(!el||!fg) return;
+    if(!test(el.value)){
+      fg.classList.add('has-error');
+      fg.querySelector('.err-msg').textContent=msg;
+      ok=false;
+    } else {
+      fg.classList.remove('has-error');
+    }
+  });
+  return ok;
+}
+
+/* ═══════════ FORM SUBMIT ═══════════ */
+document.getElementById('creditForm').addEventListener('submit', async function(e){
+  e.preventDefault();
+  if(!validateForm()){ toast('Please fix validation errors','error'); return; }
+
+  const btn=document.getElementById('submitBtn');
+  btn.disabled=true;
+  btn.innerHTML='<div class="spin"></div> Processing…';
+
+  const t0=performance.now();
+
+  const payload={
+    applicant_info:{
+      first_name: document.getElementById('firstName').value,
+      last_name:  document.getElementById('lastName').value,
+      email:      document.getElementById('email').value,
+      phone:      document.getElementById('phone').value,
+      date_of_birth: document.getElementById('dob').value||'1990-01-01',
+      address:'123 Main St', city:'New York',
+      state: document.getElementById('state').value,
+      zip_code:'10001'
+    },
+    financial_info:{
+      annual_income:        parseFloat(document.getElementById('income').value),
+      employment_status:    document.getElementById('employment').value,
+      employer_name:'Tech Corp', job_title:'Developer',
+      years_employed:       parseInt(document.getElementById('yearsEmployed').value),
+      credit_score:         parseInt(document.getElementById('creditScore').value),
+      open_accounts:        parseInt(document.getElementById('openAccounts').value),
+      closed_accounts:1,
+      total_debt:           parseFloat(document.getElementById('totalDebt').value),
+      monthly_debt_payments:parseFloat(document.getElementById('monthlyDebt').value),
+      savings_account_balance:parseFloat(document.getElementById('savings').value),
+      checking_account_balance:5000
+    },
+    loan_request:{
+      loan_amount:      parseFloat(document.getElementById('loanAmount').value),
+      loan_term_months: parseInt(document.getElementById('loanTerm').value),
+      loan_purpose:     document.getElementById('loanPurpose').value,
+      collateral:       document.getElementById('collateral').value
+    }
+  };
+
+  try{
+    const res = await fetch(`${API}/credit-decision`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(payload)
+    });
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    const d = await res.json();
+    const elapsed=((performance.now()-t0)/1000).toFixed(2);
+    populateResult(d, elapsed, payload);
+    toast('Application processed successfully','success');
+  } catch(err){
+    // Demo mode when API is offline
+    const elapsed=((performance.now()-t0)/1000).toFixed(2);
+    const cs=parseInt(document.getElementById('creditScore').value)||700;
+    const income=parseFloat(document.getElementById('income').value)||80000;
+    const debt=parseFloat(document.getElementById('monthlyDebt').value)||400;
+    const loan=parseFloat(document.getElementById('loanAmount').value)||50000;
+    const dti=(debt+loan/60)/(income/12);
+    const prob=Math.min(0.97,Math.max(0.03,(cs-300)/550*(1-dti*0.4)));
+    const decision=prob>0.65?'approved':prob>0.4?'pending':'rejected';
+    const rate=decision==='approved'?(3.5+(1-prob)*8).toFixed(2):null;
+    const demoResult={
+      application_id:'APP-'+Date.now().toString().slice(-8),
+      decision, approval_probability:prob,
+      risk_score:1-prob, recommended_interest_rate:rate?parseFloat(rate):null,
+      model_version:'xgb-v2.4.0-demo',
+      reasoning:`[Demo Mode] Based on credit score of ${cs}, estimated DTI of ${(dti*100).toFixed(1)}%, and annual income of $${income.toLocaleString()}, the applicant is classified as ${decision}. ${decision==='approved'?'Strong credit profile supports approval.':decision==='pending'?'Manual review required due to borderline risk metrics.':'Risk metrics exceed acceptable thresholds.'}`
+    };
+    populateResult(demoResult, elapsed, payload);
+    toast('Demo mode — API offline. Showing simulated result.','info');
+  } finally{
+    btn.disabled=false;
+    btn.innerHTML=`<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 8 12 12 14 14"/></svg> Process Application`;
+  }
+});
+
+function populateResult(d, elapsed, payload){
+  const dec=d.decision.toLowerCase();
+  const hero=document.getElementById('decisionHero');
+  hero.className='decision-hero '+dec;
+
+  const icons={
+    approved:'<polyline points="20 6 9 17 4 12"/>',
+    rejected:'<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',
+    pending: '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
+    review:  '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>',
+  };
+  const subs={
+    approved:'Application meets all lending criteria',
+    rejected:'Application does not meet minimum requirements',
+    pending: 'Application requires additional review',
+    review:  'Flagged for manual underwriter review',
+  };
+
+  document.getElementById('decIcon').innerHTML=icons[dec]||icons.pending;
+  document.getElementById('verdictText').textContent=dec.toUpperCase();
+  document.getElementById('verdictSub').textContent=subs[dec]||'';
+  document.getElementById('decProbVal').textContent=(d.approval_probability*100).toFixed(1)+'%';
+
+  const riskPct=(d.risk_score*100);
+  document.getElementById('riskBarFill').style.width=riskPct+'%';
+  document.getElementById('riskNeedle').style.left=riskPct+'%';
+
+  document.getElementById('r-appid').textContent   = d.application_id||'—';
+  document.getElementById('r-risk').textContent     = (d.risk_score*100).toFixed(1)+'/100';
+  document.getElementById('r-rate').textContent     = d.recommended_interest_rate ? d.recommended_interest_rate.toFixed(2)+'%' : '—';
+  document.getElementById('r-term').textContent     = (payload.loan_request.loan_term_months||60)+' months';
+  document.getElementById('r-time').textContent     = elapsed+'s';
+  document.getElementById('r-model').textContent    = d.model_version||'—';
+  document.getElementById('r-date').textContent     = new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+  document.getElementById('r-reasoning').textContent= d.reasoning||'No reasoning provided.';
+
+  // Monthly payment estimate
+  if(d.recommended_interest_rate && payload.loan_request.loan_amount){
+    const p=payload.loan_request.loan_amount;
+    const n=payload.loan_request.loan_term_months||60;
+    const r=(d.recommended_interest_rate/100)/12;
+    const mp=r>0 ? p*(r*Math.pow(1+r,n))/(Math.pow(1+r,n)-1) : p/n;
+    document.getElementById('r-monthly').textContent='$'+Math.round(mp).toLocaleString()+'/mo';
+  } else {
+    document.getElementById('r-monthly').textContent='—';
+  }
+
+  document.getElementById('resultCard').classList.add('show');
+  document.getElementById('resultCard').scrollIntoView({behavior:'smooth',block:'start'});
+
+  // Add to history
+  demoHistory.unshift({
+    id:d.application_id||'APP-'+Date.now(),
+    name:document.getElementById('firstName').value+' '+document.getElementById('lastName').value,
+    amount:parseFloat(document.getElementById('loanAmount').value)||0,
+    score:parseInt(document.getElementById('creditScore').value)||0,
+    risk:d.risk_score,decision:dec,
+    rate:d.recommended_interest_rate,
+    date:new Date().toISOString().split('T')[0]
+  });
+  filteredHistory=[...demoHistory];
+  renderHistoryPage(); refreshTable();
+}
+
+/* ═══════════ ACTIONS ═══════════ */
+function resetForm(){
+  document.getElementById('creditForm').reset();
+  document.querySelectorAll('.fg.has-error').forEach(f=>f.classList.remove('has-error'));
+  const range=document.getElementById('loanAmountRange');
+  if(range){ range.value=50000; range.dispatchEvent(new Event('input')); }
+  updateDTIPreview();
+}
+
+function downloadReport(){
+  const appId=document.getElementById('r-appid').textContent;
+  const dec=document.getElementById('verdictText').textContent;
+  const prob=document.getElementById('decProbVal').textContent;
+  const risk=document.getElementById('r-risk').textContent;
+  const rate=document.getElementById('r-rate').textContent;
+  const monthly=document.getElementById('r-monthly').textContent;
+  const reasoning=document.getElementById('r-reasoning').textContent;
+  const content=`CreditAI Pro — Decision Report\n${'='.repeat(40)}\nApplication ID: ${appId}\nDecision: ${dec}\nApproval Probability: ${prob}\nRisk Score: ${risk}\nInterest Rate: ${rate}\nEst. Monthly Payment: ${monthly}\nDate: ${new Date().toLocaleDateString()}\n\nAI Reasoning:\n${reasoning}`;
+  const a=document.createElement('a');
+  a.href='data:text/plain;charset=utf-8,'+encodeURIComponent(content);
+  a.download=`creditai-report-${appId}.txt`;a.click();
+  toast('Report downloaded','success');
+}
+
+function copyAppId(){
+  const id=document.getElementById('r-appid').textContent;
+  if(id&&id!=='—'){
+    navigator.clipboard.writeText(id).then(()=>toast('Application ID copied','success')).catch(()=>toast('Copy failed','error'));
+  }
+}
+
+/* ═══════════ RESIZE CHARTS ═══════════ */
+let resizeTimer;
+window.addEventListener('resize',()=>{
+  clearTimeout(resizeTimer);
+  resizeTimer=setTimeout(initCharts,200);
+});
+
+/* ═══════════ INIT ═══════════ */
+window.addEventListener('DOMContentLoaded',()=>{
+  loadStats();
+  setTimeout(initCharts, 100);
+  refreshTable();
+  renderHistoryPage();
+  setInterval(loadStats, 30000);
+  updateDTIPreview();
+});
+</script>
+</body>
+</html>
