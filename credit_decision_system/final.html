@@ -35,26 +35,15 @@ html{scroll-behavior:smooth;}
 body{
   font-family:var(--font-sans);
   color:var(--c-text);
-  background:#07090f;
+  background-color:#07090f;
+  background-image:url('https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=2000&q=80');
+  background-size:cover;
+  background-position:center;
+  background-attachment:fixed;
   min-height:100vh;
   overflow-x:hidden;
   position:relative;
 }
-
-/* ── BACKGROUND IMAGE LAYER ── */
-#bg-img{
-  position:fixed;
-  inset:0;
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  object-position:center;
-  z-index:0;
-  pointer-events:none;
-  opacity:0;
-  transition:opacity 1.2s ease;
-}
-#bg-img.loaded{opacity:1;}
 
 #bg-overlay{
   position:fixed;
@@ -62,7 +51,7 @@ body{
   z-index:1;
   pointer-events:none;
   background:
-    linear-gradient(160deg,rgba(7,9,15,0.91) 0%,rgba(7,9,15,0.78) 60%,rgba(10,15,35,0.88) 100%);
+    linear-gradient(160deg,rgba(7,9,15,0.82) 0%,rgba(7,9,15,0.65) 50%,rgba(10,15,35,0.80) 100%);
 }
 
 #bg-noise{
@@ -76,7 +65,6 @@ body{
   background-size:200px;
 }
 
-/* ── GLOW ORBS ── */
 .orb{
   position:fixed;
   border-radius:50%;
@@ -89,7 +77,6 @@ body{
 .orb-2{width:500px;height:500px;background:var(--c-accent);bottom:-150px;right:-150px;}
 .orb-3{width:350px;height:350px;background:var(--c-success);top:40%;left:55%;opacity:.09;}
 
-/* ── ALL CONTENT above background ── */
 .shell{position:relative;z-index:10;min-height:100vh;display:flex;flex-direction:column;}
 
 /* ── NAVBAR ── */
@@ -135,26 +122,6 @@ nav{
   transition:var(--trans);
 }
 .nav-links a:hover{color:var(--c-text);background:var(--c-surface);}
-.nav-right{display:flex;align-items:center;gap:1rem;}
-.api-pill{
-  display:flex;align-items:center;gap:.45rem;
-  font-size:.75rem;font-weight:600;
-  letter-spacing:.5px;text-transform:uppercase;
-  padding:.4rem .9rem;
-  border-radius:30px;
-  background:rgba(0,232,122,0.12);
-  border:1px solid rgba(0,232,122,0.3);
-  color:var(--c-success);
-  transition:var(--trans);
-}
-.api-pill.offline{background:rgba(255,69,96,0.12);border-color:rgba(255,69,96,0.3);color:var(--c-error);}
-.api-pill .pulse{
-  width:7px;height:7px;border-radius:50%;
-  background:var(--c-success);
-  animation:pulse 2s ease-in-out infinite;
-}
-.api-pill.offline .pulse{background:var(--c-error);animation:none;}
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.5;transform:scale(1.3);}}
 
 /* ── MAIN ── */
 main{flex:1;max-width:1540px;margin:0 auto;padding:2.5rem 2rem;width:100%;}
@@ -324,12 +291,6 @@ tbody tr:hover td{background:rgba(255,255,255,.03);color:var(--c-text);}
 .pill.rejected{background:rgba(255,69,96,.12);color:var(--c-error);}
 .pill.pending {background:rgba(255,176,32,.12);color:var(--c-warn);}
 .pill.review  {background:rgba(0,210,255,.12);color:var(--c-primary);}
-
-/* ── RISK SCORE GAUGE ── */
-.gauge-wrap{text-align:center;padding:1rem 0;}
-.gauge-svg{width:180px;height:110px;margin:0 auto;display:block;}
-.gauge-val{font:700 2rem/1 var(--font-mono);color:var(--c-text);margin-top:.5rem;}
-.gauge-lbl{font-size:.72rem;color:var(--c-faint);letter-spacing:.5px;text-transform:uppercase;margin-top:.3rem;}
 
 /* ── FORM ── */
 .form-card{
@@ -506,6 +467,64 @@ tbody tr:hover td{background:rgba(255,255,255,.03);color:var(--c-text);}
   box-shadow:0 0 6px rgba(255,255,255,.4);
 }
 
+/* ── RISK DISTRIBUTION EXTRAS ── */
+.risk-tier-table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:.8rem;
+  margin-top:1rem;
+}
+.risk-tier-table thead th{
+  text-align:left;
+  padding:.5rem .6rem;
+  font-size:.67rem;
+  font-weight:700;
+  letter-spacing:.7px;
+  text-transform:uppercase;
+  color:var(--c-faint);
+  border-bottom:1px solid var(--c-border);
+}
+.risk-tier-table tbody td{
+  padding:.55rem .6rem;
+  border-bottom:1px solid rgba(255,255,255,.03);
+  color:var(--c-muted);
+  white-space:nowrap;
+}
+.risk-tier-table tbody tr:last-child td{border-bottom:none;}
+.risk-tier-table tbody tr:hover td{background:rgba(255,255,255,.025);color:var(--c-text);}
+.tier-dot{
+  display:inline-block;
+  width:8px;height:8px;border-radius:50%;
+  margin-right:.45rem;
+  vertical-align:middle;
+}
+.risk-summary-row{
+  display:flex;
+  gap:.8rem;
+  margin-top:1.1rem;
+  flex-wrap:wrap;
+}
+.risk-summary-chip{
+  flex:1;
+  min-width:80px;
+  background:rgba(255,255,255,.035);
+  border:1px solid var(--c-border);
+  border-radius:var(--radius-sm);
+  padding:.7rem .8rem;
+  text-align:center;
+}
+.risk-summary-chip .chip-val{
+  font:700 1.25rem/1 var(--font-mono);
+  margin-bottom:.3rem;
+}
+.risk-summary-chip .chip-lbl{
+  font-size:.65rem;
+  font-weight:600;
+  letter-spacing:.5px;
+  text-transform:uppercase;
+  color:var(--c-faint);
+}
+
 /* ── TOAST ── */
 #toast{
   position:fixed;bottom:2rem;right:2rem;z-index:9999;
@@ -556,7 +575,6 @@ footer{
   position:relative;z-index:10;
 }
 
-/* ── SCROLLBAR ── */
 ::-webkit-scrollbar{width:6px;height:6px;}
 ::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:3px;}
@@ -572,8 +590,6 @@ footer{
 </head>
 <body>
 
-<!-- Background image loaded via JS to handle CORS gracefully -->
-<img id="bg-img" alt="" aria-hidden="true">
 <div id="bg-overlay"></div>
 <div id="bg-noise"></div>
 <div class="orb orb-1"></div>
@@ -582,7 +598,7 @@ footer{
 
 <div class="shell">
 
-<!-- NAV -->
+<!-- NAV — API pill removed -->
 <nav>
   <div class="nav-logo">
     <div class="dot"></div>
@@ -593,13 +609,9 @@ footer{
     <a href="#" onclick="switchTab('tab-apply',document.querySelectorAll('.tab-btn')[1]);return false;">New Application</a>
     <a href="#" onclick="switchTab('tab-history',document.querySelectorAll('.tab-btn')[2]);return false;">History</a>
   </div>
-  <div class="nav-right">
-    <div class="api-pill" id="apiPill"><div class="pulse"></div><span id="apiLabel">API Online</span></div>
-  </div>
 </nav>
 
 <main>
-  <!-- HEADER -->
   <div class="page-header">
     <h1>Credit Intelligence Platform</h1>
     <p>AI-powered risk assessment &amp; intelligent lending decisions at scale</p>
@@ -612,7 +624,6 @@ footer{
     </div>
   </div>
 
-  <!-- TABS -->
   <div class="tabs-bar">
     <button class="tab-btn active" onclick="switchTab('tab-dashboard',this)">
       <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
@@ -635,7 +646,6 @@ footer{
   <!-- ═══════════════ DASHBOARD TAB ═══════════════ -->
   <div id="tab-dashboard" class="tab-content active">
 
-    <!-- Stat cards -->
     <div class="stats-grid fade-up">
       <div class="stat-card">
         <div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div>
@@ -675,7 +685,6 @@ footer{
       </div>
     </div>
 
-    <!-- Charts row -->
     <div class="dash-grid fade-up fade-up-1">
       <div class="card span-2">
         <div class="card-title">
@@ -694,7 +703,7 @@ footer{
       </div>
     </div>
 
-    <!-- Model + Risk + Recent -->
+    <!-- Model + Risk + System -->
     <div class="dash-grid fade-up fade-up-2">
       <div class="card">
         <div class="card-title">
@@ -727,13 +736,92 @@ footer{
           <span class="mv">0.963</span>
         </div>
       </div>
+
+      <!-- ── ENRICHED RISK DISTRIBUTION CARD ── -->
       <div class="card">
         <div class="card-title">
           <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
           Risk Distribution
         </div>
-        <canvas id="chartBar" class="chart" height="190"></canvas>
+
+        <!-- Bar chart -->
+        <canvas id="chartBar" class="chart" height="150"></canvas>
+
+        <!-- Summary chips -->
+        <div class="risk-summary-row">
+          <div class="risk-summary-chip">
+            <div class="chip-val" style="color:var(--c-success)">149</div>
+            <div class="chip-lbl">Low Risk</div>
+          </div>
+          <div class="risk-summary-chip">
+            <div class="chip-val" style="color:#7ee87a">348</div>
+            <div class="chip-lbl">Low-Med</div>
+          </div>
+          <div class="risk-summary-chip">
+            <div class="chip-val" style="color:var(--c-warn)">436</div>
+            <div class="chip-lbl">Medium</div>
+          </div>
+          <div class="risk-summary-chip">
+            <div class="chip-val" style="color:#ff7b4a">224</div>
+            <div class="chip-lbl">Med-High</div>
+          </div>
+          <div class="risk-summary-chip">
+            <div class="chip-val" style="color:var(--c-error)">87</div>
+            <div class="chip-lbl">High Risk</div>
+          </div>
+        </div>
+
+        <!-- Tier breakdown table -->
+        <table class="risk-tier-table">
+          <thead>
+            <tr>
+              <th>Tier</th>
+              <th>Score Band</th>
+              <th>Count</th>
+              <th>Approval</th>
+              <th>Avg Rate</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="tier-dot" style="background:#00e87a"></span>Low</td>
+              <td style="font-family:var(--font-mono);font-size:.75rem">0 – 20</td>
+              <td style="font-family:var(--font-mono);color:var(--c-text)">149</td>
+              <td style="font-family:var(--font-mono);color:var(--c-success)">98.6%</td>
+              <td style="font-family:var(--font-mono);color:var(--c-success)">4.1%</td>
+            </tr>
+            <tr>
+              <td><span class="tier-dot" style="background:#7ee87a"></span>Low-Med</td>
+              <td style="font-family:var(--font-mono);font-size:.75rem">21 – 40</td>
+              <td style="font-family:var(--font-mono);color:var(--c-text)">348</td>
+              <td style="font-family:var(--font-mono);color:var(--c-success)">87.4%</td>
+              <td style="font-family:var(--font-mono);color:#7ee87a">5.8%</td>
+            </tr>
+            <tr>
+              <td><span class="tier-dot" style="background:#ffb020"></span>Medium</td>
+              <td style="font-family:var(--font-mono);font-size:.75rem">41 – 60</td>
+              <td style="font-family:var(--font-mono);color:var(--c-text)">436</td>
+              <td style="font-family:var(--font-mono);color:var(--c-warn)">61.2%</td>
+              <td style="font-family:var(--font-mono);color:var(--c-warn)">8.3%</td>
+            </tr>
+            <tr>
+              <td><span class="tier-dot" style="background:#ff7b4a"></span>Med-High</td>
+              <td style="font-family:var(--font-mono);font-size:.75rem">61 – 80</td>
+              <td style="font-family:var(--font-mono);color:var(--c-text)">224</td>
+              <td style="font-family:var(--font-mono);color:var(--c-warn)">28.1%</td>
+              <td style="font-family:var(--font-mono);color:#ff7b4a">11.9%</td>
+            </tr>
+            <tr>
+              <td><span class="tier-dot" style="background:#ff4560"></span>High</td>
+              <td style="font-family:var(--font-mono);font-size:.75rem">81 – 100</td>
+              <td style="font-family:var(--font-mono);color:var(--c-text)">87</td>
+              <td style="font-family:var(--font-mono);color:var(--c-error)">4.6%</td>
+              <td style="font-family:var(--font-mono);color:var(--c-error)">—</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
+
       <div class="card">
         <div class="card-title">
           <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
@@ -787,8 +875,6 @@ footer{
       <p class="sub">Complete all sections. The AI model will evaluate risk and return a decision within seconds.</p>
 
       <form id="creditForm" novalidate>
-
-        <!-- Personal -->
         <div class="form-grid">
           <div class="section-divider full"><span>Personal Information</span></div>
 
@@ -827,7 +913,6 @@ footer{
             </select>
           </div>
 
-          <!-- Financial -->
           <div class="section-divider full"><span>Financial Information</span></div>
 
           <div class="fg">
@@ -876,7 +961,6 @@ footer{
             <span class="err-msg">Required</span>
           </div>
 
-          <!-- Loan Details -->
           <div class="section-divider full"><span>Loan Details</span></div>
 
           <div class="fg full">
@@ -961,7 +1045,6 @@ footer{
         </div>
       </div>
 
-      <!-- Risk bar -->
       <div class="risk-bar-wrap">
         <div class="risk-bar-labels"><span>Low Risk</span><span>Medium</span><span>High Risk</span></div>
         <div class="risk-bar-track"><div class="risk-bar-fill" id="riskBarFill" style="width:100%"></div></div>
@@ -1081,27 +1164,14 @@ footer{
 </footer>
 </div><!-- .shell -->
 
-<!-- Toast container -->
 <div id="toast"></div>
 
 <script>
-/* ═══════════ CONFIG ═══════════ */
 const API = 'http://localhost:8001/api/v1';
 
-/* ═══════════ BACKGROUND IMAGE ═══════════ */
-(function(){
-  const img = document.getElementById('bg-img');
-  // High-quality finance/data background from Unsplash (direct image, no redirect)
-  img.src = 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=2000&q=80';
-  img.onload  = () => img.classList.add('loaded');
-  img.onerror = () => {
-    // Fallback to a second image if first fails
-    img.src = 'https://images.unsplash.com/photo-1579547621706-1a9c79d5c9f1?auto=format&fit=crop&w=2000&q=80';
-    img.onload = () => img.classList.add('loaded');
-  };
-})();
 
-/* ═══════════ TABS ═══════════ */
+
+/* ── TABS ── */
 function switchTab(id, btn){
   document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -1109,7 +1179,7 @@ function switchTab(id, btn){
   if(btn) btn.classList.add('active');
 }
 
-/* ═══════════ TOAST ═══════════ */
+/* ── TOAST ── */
 function toast(msg, type='info', dur=3500){
   const box = document.getElementById('toast');
   const el  = document.createElement('div');
@@ -1121,7 +1191,7 @@ function toast(msg, type='info', dur=3500){
     el.style.transition='all .3s ease'; setTimeout(()=>el.remove(),300); }, dur);
 }
 
-/* ═══════════ STATS / API ═══════════ */
+/* ── STATS ── */
 async function loadStats(){
   try{
     const r = await fetch(`${API}/dashboard-stats`);
@@ -1134,10 +1204,7 @@ async function loadStats(){
     document.getElementById('st-rate').textContent  = (d.approval_rate*100).toFixed(1)+'%';
     document.getElementById('st-score').textContent = Math.round(d.average_credit_score);
     document.getElementById('reqToday').textContent = (d.total_applications||0).toLocaleString();
-    setOnline(true);
   } catch{
-    setOnline(false);
-    // Use demo values when API is offline
     animCount('st-total',    1247);
     animCount('st-approved', 849);
     animCount('st-rejected', 276);
@@ -1154,27 +1221,19 @@ async function loadStats(){
   }
 }
 
-function setOnline(on){
-  const p=document.getElementById('apiPill');
-  const l=document.getElementById('apiLabel');
-  p.className = 'api-pill'+(on?'':' offline');
-  l.textContent = on ? 'API Online' : 'API Offline';
-}
-
 function animCount(id, target){
   const el = document.getElementById(id);
   if(!el) return;
-  const start = 0, dur = 900, startTime = performance.now();
+  const dur = 900, startTime = performance.now();
   function step(now){
     const p = Math.min((now-startTime)/dur,1);
-    const val = Math.round(p*target);
-    el.textContent = val.toLocaleString();
+    el.textContent = Math.round(p*target).toLocaleString();
     if(p<1) requestAnimationFrame(step);
   }
   requestAnimationFrame(step);
 }
 
-/* ═══════════ DEMO DATA ═══════════ */
+/* ── DEMO DATA ── */
 const demoHistory = [
   {id:'APP-20240501',name:'Alice Johnson',amount:42000,score:768,risk:0.18,decision:'approved',rate:5.4,date:'2026-04-30'},
   {id:'APP-20240502',name:'Bob Martinez',amount:15000,score:610,risk:0.61,decision:'rejected',rate:null,date:'2026-04-30'},
@@ -1252,7 +1311,7 @@ function exportCSV(){
   toast('CSV exported','success');
 }
 
-/* ═══════════ CHARTS ═══════════ */
+/* ── CHARTS ── */
 function drawLineChart(){
   const canvas=document.getElementById('chartLine');
   if(!canvas) return;
@@ -1270,7 +1329,6 @@ function drawLineChart(){
 
   ctx.clearRect(0,0,W,H);
 
-  // Grid
   ctx.strokeStyle='rgba(255,255,255,0.05)';ctx.lineWidth=1;
   for(let i=0;i<=4;i++){
     const y=pad.t+(gH/4)*i;
@@ -1279,7 +1337,6 @@ function drawLineChart(){
     ctx.fillText(Math.round(maxV*(1-i/4)),4,y+4);
   }
 
-  // X labels
   ctx.fillStyle='rgba(232,237,245,0.4)';ctx.font='11px DM Mono,monospace';ctx.textAlign='center';
   days.forEach((d,i)=>{
     const x=pad.l+(i/(days.length-1))*gW;
@@ -1291,36 +1348,26 @@ function drawLineChart(){
       x:pad.l+(i/(data.length-1))*gW,
       y:pad.t+gH-(v/maxV)*gH
     }));
-
     if(fill){
       const grad=ctx.createLinearGradient(0,pad.t,0,pad.t+gH);
       grad.addColorStop(0,color.replace('1)','0.25)'));
       grad.addColorStop(1,color.replace('1)','0)'));
-      ctx.beginPath();
-      ctx.moveTo(pts[0].x,pad.t+gH);
+      ctx.beginPath();ctx.moveTo(pts[0].x,pad.t+gH);
       pts.forEach(p=>ctx.lineTo(p.x,p.y));
       ctx.lineTo(pts[pts.length-1].x,pad.t+gH);
-      ctx.closePath();
-      ctx.fillStyle=grad;ctx.fill();
+      ctx.closePath();ctx.fillStyle=grad;ctx.fill();
     }
-
     ctx.beginPath();
     pts.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));
-    ctx.strokeStyle=color;ctx.lineWidth=2.5;ctx.lineJoin='round';
-    ctx.stroke();
-
-    pts.forEach(p=>{
-      ctx.beginPath();ctx.arc(p.x,p.y,4,0,Math.PI*2);
-      ctx.fillStyle=color;ctx.fill();
-    });
+    ctx.strokeStyle=color;ctx.lineWidth=2.5;ctx.lineJoin='round';ctx.stroke();
+    pts.forEach(p=>{ctx.beginPath();ctx.arc(p.x,p.y,4,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();});
   }
 
   drawLine(apps,'rgba(0,210,255,1)',true);
   drawLine(approved,'rgba(0,232,122,1)',false);
 
-  // Legend
   const lx=pad.l+gW-120;
-  [[`rgba(0,210,255,1)`,'Total'],[`rgba(0,232,122,1)`,'Approved']].forEach(([c,l],i)=>{
+  [['rgba(0,210,255,1)','Total'],['rgba(0,232,122,1)','Approved']].forEach(([c,l],i)=>{
     ctx.fillStyle=c;ctx.fillRect(lx+i*65,6,14,3);
     ctx.fillStyle='rgba(232,237,245,0.6)';ctx.font='11px DM Sans,sans-serif';ctx.textAlign='left';
     ctx.fillText(l,lx+i*65+18,10);
@@ -1352,17 +1399,14 @@ function drawDonut(){
     angle+=sweep;
   });
 
-  // Inner hole
   ctx.beginPath();ctx.arc(cx,cy,ir,0,Math.PI*2);
   ctx.fillStyle='#0d1117';ctx.fill();
 
-  // Center text
   ctx.fillStyle='#fff';ctx.font='700 1.5rem DM Mono,monospace';ctx.textAlign='center';
   ctx.fillText('68%',cx,cy+2);
   ctx.fillStyle='rgba(232,237,245,0.5)';ctx.font='11px DM Sans,sans-serif';
   ctx.fillText('Approval',cx,cy+18);
 
-  // Legend
   const legend=document.getElementById('donut-legend');
   if(legend){
     legend.innerHTML=data.map(d=>`
@@ -1377,40 +1421,60 @@ function drawBarChart(){
   const canvas=document.getElementById('chartBar');
   if(!canvas) return;
   const ctx=canvas.getContext('2d');
-  const W=canvas.offsetWidth||300, H=190;
+  const W=canvas.offsetWidth||300, H=150;
   canvas.width=W; canvas.height=H;
 
   const labels=['0–20','21–40','41–60','61–80','81–100'];
   const vals=[12,28,35,18,7];
+  const counts=[149,348,436,224,87];
   const colors=['#00e87a','#7ee87a','#ffb020','#ff7b4a','#ff4560'];
 
-  const pad={t:10,r:10,b:30,l:30};
+  const pad={t:14,r:10,b:32,l:30};
   const bW=(W-pad.l-pad.r)/labels.length;
-  const maxV=Math.max(...vals)*1.15;
+  const maxV=Math.max(...vals)*1.2;
   const gH=H-pad.t-pad.b;
 
   ctx.clearRect(0,0,W,H);
 
+  // Gridlines
+  ctx.strokeStyle='rgba(255,255,255,0.04)';ctx.lineWidth=1;
+  for(let i=0;i<=3;i++){
+    const y=pad.t+(gH/3)*i;
+    ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(W-pad.r,y);ctx.stroke();
+  }
+
   vals.forEach((v,i)=>{
-    const x=pad.l+i*bW+bW*.12;
+    const x=pad.l+i*bW+bW*.1;
     const bh=(v/maxV)*gH;
     const y=pad.t+gH-bh;
+    const bww=bW*.8;
 
     const grad=ctx.createLinearGradient(0,y,0,pad.t+gH);
     grad.addColorStop(0,colors[i]);
-    grad.addColorStop(1,colors[i].replace('#','rgba(').replace(/([0-9a-f]{2})/gi,m=>parseInt(m,16)+',').slice(0,-1)+',0.3)');
-
+    grad.addColorStop(1,colors[i]+'44');
     ctx.fillStyle=grad;
     ctx.beginPath();
-    ctx.roundRect(x,y,bW*.76,bh,4);
+    ctx.roundRect(x,y,bww,bh,3);
     ctx.fill();
 
-    ctx.fillStyle='rgba(232,237,245,0.6)';
-    ctx.font='10px DM Mono,monospace';ctx.textAlign='center';
+    // Count label above bar
+    ctx.fillStyle='rgba(232,237,245,0.85)';
+    ctx.font='600 10px DM Mono,monospace';ctx.textAlign='center';
+    ctx.fillText(counts[i],x+bww/2,y-3);
+
+    // X-axis label
+    ctx.fillStyle='rgba(232,237,245,0.45)';
+    ctx.font='10px DM Mono,monospace';
     ctx.fillText(labels[i],pad.l+i*bW+bW/2,H-8);
-    ctx.fillStyle='rgba(232,237,245,0.9)';
-    ctx.fillText(v+'%',pad.l+i*bW+bW/2,y-4);
   });
+
+  // Y-axis label
+  ctx.save();
+  ctx.translate(10,H/2);ctx.rotate(-Math.PI/2);
+  ctx.fillStyle='rgba(232,237,245,0.25)';
+  ctx.font='9px DM Sans,sans-serif';ctx.textAlign='center';
+  ctx.fillText('% of portfolio',0,0);
+  ctx.restore();
 }
 
 function drawFeatureChart(){
@@ -1463,7 +1527,7 @@ function initCharts(){
   drawLineChart(); drawDonut(); drawBarChart(); drawFeatureChart();
 }
 
-/* ═══════════ LOAN RANGE SLIDER ═══════════ */
+/* ── LOAN RANGE ── */
 (function(){
   const range=document.getElementById('loanAmountRange');
   const display=document.getElementById('loanAmtDisplay');
@@ -1480,7 +1544,7 @@ function initCharts(){
   range.addEventListener('input',upd); upd();
 })();
 
-/* ═══════════ DTI PREVIEW ═══════════ */
+/* ── DTI PREVIEW ── */
 function updateDTIPreview(){
   const income  = parseFloat(document.getElementById('income')?.value)||0;
   const debt    = parseFloat(document.getElementById('monthlyDebt')?.value)||0;
@@ -1503,7 +1567,7 @@ function updateDTIPreview(){
   if(el) el.addEventListener('input',updateDTIPreview);
 });
 
-/* ═══════════ FORM VALIDATION ═══════════ */
+/* ── FORM VALIDATION ── */
 function validateForm(){
   let ok=true;
   const rules=[
@@ -1534,7 +1598,7 @@ function validateForm(){
   return ok;
 }
 
-/* ═══════════ FORM SUBMIT ═══════════ */
+/* ── FORM SUBMIT ── */
 document.getElementById('creditForm').addEventListener('submit', async function(e){
   e.preventDefault();
   if(!validateForm()){ toast('Please fix validation errors','error'); return; }
@@ -1589,7 +1653,6 @@ document.getElementById('creditForm').addEventListener('submit', async function(
     populateResult(d, elapsed, payload);
     toast('Application processed successfully','success');
   } catch(err){
-    // Demo mode when API is offline
     const elapsed=((performance.now()-t0)/1000).toFixed(2);
     const cs=parseInt(document.getElementById('creditScore').value)||700;
     const income=parseFloat(document.getElementById('income').value)||80000;
@@ -1650,7 +1713,6 @@ function populateResult(d, elapsed, payload){
   document.getElementById('r-date').textContent     = new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
   document.getElementById('r-reasoning').textContent= d.reasoning||'No reasoning provided.';
 
-  // Monthly payment estimate
   if(d.recommended_interest_rate && payload.loan_request.loan_amount){
     const p=payload.loan_request.loan_amount;
     const n=payload.loan_request.loan_term_months||60;
@@ -1664,7 +1726,6 @@ function populateResult(d, elapsed, payload){
   document.getElementById('resultCard').classList.add('show');
   document.getElementById('resultCard').scrollIntoView({behavior:'smooth',block:'start'});
 
-  // Add to history
   demoHistory.unshift({
     id:d.application_id||'APP-'+Date.now(),
     name:document.getElementById('firstName').value+' '+document.getElementById('lastName').value,
@@ -1678,7 +1739,7 @@ function populateResult(d, elapsed, payload){
   renderHistoryPage(); refreshTable();
 }
 
-/* ═══════════ ACTIONS ═══════════ */
+/* ── ACTIONS ── */
 function resetForm(){
   document.getElementById('creditForm').reset();
   document.querySelectorAll('.fg.has-error').forEach(f=>f.classList.remove('has-error'));
@@ -1709,14 +1770,14 @@ function copyAppId(){
   }
 }
 
-/* ═══════════ RESIZE CHARTS ═══════════ */
+/* ── RESIZE ── */
 let resizeTimer;
 window.addEventListener('resize',()=>{
   clearTimeout(resizeTimer);
   resizeTimer=setTimeout(initCharts,200);
 });
 
-/* ═══════════ INIT ═══════════ */
+/* ── INIT ── */
 window.addEventListener('DOMContentLoaded',()=>{
   loadStats();
   setTimeout(initCharts, 100);
